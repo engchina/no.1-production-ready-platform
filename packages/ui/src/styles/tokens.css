@@ -114,11 +114,12 @@ body {
   font-feature-settings: "tnum";
 }
 
-/* 一覧が増えてもページ全体を押し下げない、業務画面向けの内部スクロール領域。 */
+/* 一覧が増えてもページ全体を押し下げない、業務画面向けの内部スクロール領域。
+ * overscroll-behavior: contain は付けない — スクロール余地がない(中身が少ない)ときも
+ * wheel の scroll chaining を遮断し、カード上でページが動かなくなるため。 */
 .bounded-scroll-area,
 .bounded-scroll-area-lg {
   overflow-y: auto;
-  overscroll-behavior: contain;
   scrollbar-gutter: stable;
 }
 
