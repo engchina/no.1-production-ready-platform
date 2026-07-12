@@ -51,6 +51,20 @@ export {
   StatusBadge,
   type StatusVariant,
 } from "./components/data/status-badge";
+export {
+  Pagination,
+  usePagination,
+  DEFAULT_PAGE_SIZE,
+  type PaginationProps,
+  type PaginationRange,
+} from "./components/data/pagination";
+export {
+  DataTable,
+  type DataTableProps,
+  type DataTableColumn,
+  type DataTableSort,
+  type SortDirection,
+} from "./components/data/data-table";
 
 // --- app shell / layout ---
 export { AppShell } from "./components/app-shell/AppShell";
@@ -74,6 +88,7 @@ export {
   createUiStore,
   type UiState,
   type CreateUiStoreOptions,
+  type ThemePreference,
 } from "./store/ui-store";
 export {
   useToastStore,

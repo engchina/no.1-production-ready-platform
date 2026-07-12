@@ -10,6 +10,9 @@ import { createJSONStorage, persist, type StateStorage } from "zustand/middlewar
  * このストアは「アプリ側の利便フック」という位置づけ。
  */
 
+/** 配色テーマ。"system" は OS の prefers-color-scheme に追従。既定は "light"。 */
+export type ThemePreference = "light" | "dark" | "system";
+
 export interface UiState {
   sidebarCollapsed: boolean;
   setSidebarCollapsed: (collapsed: boolean) => void;
@@ -21,6 +24,9 @@ export interface UiState {
   collapsedSections: Record<string, boolean>;
   toggleSection: (key: string) => void;
   setSectionCollapsed: (key: string, collapsed: boolean) => void;
+  /** 配色テーマの選好（永続化）。適用（html.dark 付与）はアプリ側で行う。 */
+  theme: ThemePreference;
+  setTheme: (theme: ThemePreference) => void;
 }
 
 export interface CreateUiStoreOptions {
@@ -85,12 +91,15 @@ export function createUiStore(options: CreateUiStoreOptions) {
           set((state) => ({
             collapsedSections: { ...state.collapsedSections, [key]: collapsed },
           })),
+        theme: "light",
+        setTheme: (theme) => set({ theme }),
       }),
       {
         name: options.storageKey,
         partialize: (state) => ({
           sidebarCollapsed: state.sidebarCollapsed,
           collapsedSections: state.collapsedSections,
+          theme: state.theme,
         }),
         storage: createJSONStorage(resolveStorage),
       }
