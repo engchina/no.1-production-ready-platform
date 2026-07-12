@@ -35,7 +35,7 @@ export function StatusBadge({
   return (
     <span
       className={cn(
-        "inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium",
+        "inline-flex items-center justify-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium",
         VARIANT_STYLES[variant],
         className
       )}
