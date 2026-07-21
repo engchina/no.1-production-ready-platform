@@ -39,7 +39,7 @@ packages/ui/
     lib/utils.ts             cn()
     components/
       ui/                    Button / Card / Switch / Skeleton / Select / Banner /
-                             Toast / ConfirmDialog / ToggleChip / FieldError / FormStatus
+                             Toast / MessageText / ConfirmDialog / ToggleChip / FieldError / FormStatus
       feedback/              LoadingState / ErrorState / EmptyState
       data/                  StatusBadge(汎用 variant)
       app-shell/             AppShell / Sidebar / PageHeader / Breadcrumbs
@@ -56,6 +56,10 @@ npm run build         # dist/index.js + dist/index.d.ts + dist/tokens.css
 ```
 
 ## 消費側(各アプリ)の使い方
+
+通知・バナー・フォーム状態・確認ダイアログ・状態ビューの文字列は `MessageText` を内部利用し、
+改行や連続空白を正規化したうえで、日本語・英語の文末を優先して折り返す。単独の長文や URL は
+コンテナ幅内で安全に折り返す。独自の通知本文を組む場合も公開 `MessageText` を使用する。
 
 ### 1. 依存追加(開発時はローカル file: リンク)
 

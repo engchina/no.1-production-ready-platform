@@ -2,6 +2,7 @@ import { AlertCircle, Inbox, RefreshCw } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Button } from "../ui/button";
+import { MessageText } from "../ui/message-text";
 import { Skeleton } from "../ui/skeleton";
 
 /**
@@ -37,7 +38,9 @@ export function ErrorState({
       className="flex flex-col items-center gap-3 rounded-lg border border-danger/30 bg-danger-bg/40 p-8 text-center"
     >
       <AlertCircle size={24} className="text-danger" aria-hidden />
-      <p className="text-sm text-foreground">{message}</p>
+      <p className="text-sm leading-relaxed text-foreground">
+        <MessageText text={message} />
+      </p>
       {onRetry ? (
         <Button type="button" variant="secondary" size="sm" onClick={onRetry}>
           <RefreshCw size={14} aria-hidden />
@@ -61,8 +64,14 @@ export function EmptyState({
   return (
     <div className="flex flex-col items-center gap-1 py-10 text-center">
       <Inbox size={22} className="text-muted" aria-hidden />
-      <p className="mt-1 text-sm text-foreground">{title}</p>
-      {hint ? <p className="max-w-md text-xs leading-relaxed text-muted">{hint}</p> : null}
+      <p className="mt-1 text-sm leading-relaxed text-foreground">
+        <MessageText text={title} />
+      </p>
+      {hint ? (
+        <p className="max-w-md text-xs leading-relaxed text-muted">
+          <MessageText text={hint} />
+        </p>
+      ) : null}
       {action ? <div className="mt-3">{action}</div> : null}
     </div>
   );

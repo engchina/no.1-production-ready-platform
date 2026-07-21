@@ -13,6 +13,7 @@ import { cn } from "../../lib/utils";
 
 import { Button } from "./button";
 import { toneIcon, type FeedbackTone } from "./feedback-tone";
+import { MessageText } from "./message-text";
 
 /**
  * ConfirmDialog（確認ダイアログ）。
@@ -181,11 +182,11 @@ function ConfirmDialog({
           </span>
           <div className="min-w-0 flex-1">
             <h2 id="confirm-title" className="text-base font-semibold text-foreground">
-              {title}
+              <MessageText text={title} />
             </h2>
             {description ? (
-              <p id="confirm-desc" className="mt-1 text-sm text-muted">
-                {description}
+              <p id="confirm-desc" className="mt-1 text-sm leading-relaxed text-muted">
+                <MessageText text={description} />
               </p>
             ) : null}
           </div>

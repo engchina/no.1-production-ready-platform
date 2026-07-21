@@ -45,7 +45,12 @@ export function Button({
   return (
     <button
       ref={ref}
-      className={cn(buttonVariants({ variant, size }), className)}
+      className={cn(
+        buttonVariants({ variant, size }),
+        // loading 中は自前のスピナーのみ表示し、children 側の先頭アイコン（svg）を隠してアイコン二重表示を防ぐ
+        loading && "[&>svg:not(.animate-spin)]:hidden",
+        className
+      )}
       disabled={disabled || loading}
       {...props}
     >

@@ -24,7 +24,8 @@ export {
   type SelectFieldOption,
 } from "./components/ui/select-field";
 export { Banner } from "./components/ui/banner";
-export { Toaster } from "./components/ui/toast";
+export { MessageText, type MessageTextProps } from "./components/ui/message-text";
+export { Toaster, type ToasterProps } from "./components/ui/toast";
 export {
   ConfirmProvider,
   useConfirm,

@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "build": "npm run build -w @engchina/production-ready-ui",
+    "test": "npm run test -w @engchina/production-ready-ui",
     "typecheck": "npm run typecheck -w @engchina/production-ready-ui"
   }
 }

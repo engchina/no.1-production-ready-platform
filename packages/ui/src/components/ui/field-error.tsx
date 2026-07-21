@@ -1,5 +1,7 @@
 import { cn } from "../../lib/utils";
 
+import { MessageText } from "./message-text";
+
 /**
  * FieldError（フィールド検証エラー）。
  * 該当入力欄の直下に置き、入力側の `aria-describedby={id}` と対応させる。
@@ -16,8 +18,8 @@ export function FieldError({
 }) {
   if (!message) return null;
   return (
-    <p id={id} role="alert" className={cn("text-xs text-danger", className)}>
-      {message}
+    <p id={id} role="alert" className={cn("text-xs leading-relaxed text-danger", className)}>
+      <MessageText text={message} />
     </p>
   );
 }

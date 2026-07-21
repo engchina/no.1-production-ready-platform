@@ -1,6 +1,7 @@
 import { cn } from "../../lib/utils";
 
 import { toneIcon, toneRole, toneText, type FeedbackTone } from "./feedback-tone";
+import { MessageText } from "./message-text";
 
 /**
  * FormStatus（フォーム/アクション結果）。
@@ -22,10 +23,14 @@ export function FormStatus({
   return (
     <p
       role={toneRole(tone)}
-      className={cn("inline-flex items-center gap-1.5 text-sm font-medium", toneText[tone], className)}
+      className={cn(
+        "inline-flex min-w-0 items-start gap-1.5 text-sm font-medium leading-relaxed",
+        toneText[tone],
+        className
+      )}
     >
-      <Icon size={15} className="shrink-0" aria-hidden />
-      {message}
+      <Icon size={15} className="mt-0.5 shrink-0" aria-hidden />
+      <MessageText text={message} />
     </p>
   );
 }
