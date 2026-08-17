@@ -11,10 +11,11 @@ import { MessageText } from "./message-text";
 export interface ToasterProps {
   dismissLabel?: string;
   regionLabel?: string;
+  placement?: "bottom-left" | "bottom-right";
 }
 
 /**
- * Toast 表示領域（画面右下スタック）。
+ * Toast 表示領域（既定は画面右下スタック）。
  * フォーカスを奪わず aria-live で読み上げる（toast-accessibility）。
  * アプリ最上位で一度だけ描画する。
  *
@@ -23,6 +24,7 @@ export interface ToasterProps {
 export function Toaster({
   dismissLabel = "閉じる",
   regionLabel = "通知",
+  placement = "bottom-right",
 }: ToasterProps = {}) {
   const toasts = useToastStore((state) => state.toasts);
   const [mounted, setMounted] = useState(false);
@@ -39,7 +41,9 @@ export function Toaster({
       className="pointer-events-none fixed z-[1000] flex max-h-[calc(100dvh-2rem)] w-[min(92vw,22rem)] flex-col gap-2 overflow-y-auto"
       style={{
         bottom: "max(1rem, env(safe-area-inset-bottom))",
-        right: "max(1rem, env(safe-area-inset-right))",
+        ...(placement === "bottom-left"
+          ? { left: "max(1rem, env(safe-area-inset-left))" }
+          : { right: "max(1rem, env(safe-area-inset-right))" }),
       }}
     >
       {toasts.map((item) => (
