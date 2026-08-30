@@ -1,8 +1,8 @@
-import { Loader2 } from "lucide-react";
 import { cva, type VariantProps } from "class-variance-authority";
 import type { ButtonHTMLAttributes, Ref } from "react";
 
 import { cn } from "../../lib/utils";
+import { Spinner } from "./spinner";
 
 export const buttonVariants = cva(
   "inline-flex max-w-full cursor-pointer items-center justify-center gap-1.5 overflow-hidden whitespace-nowrap rounded-md text-sm font-medium leading-none transition-colors disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring [&>span]:min-w-0 [&>span]:truncate [&>svg]:block [&>svg]:shrink-0",
@@ -54,7 +54,11 @@ export function Button({
       disabled={disabled || loading}
       {...props}
     >
-      {loading ? <Loader2 size={15} className="animate-spin" aria-hidden /> : null}
+      {/*
+        スピナーは全周トラック付きの Spinner を使う（回転してもシルエットが変わらず中心ぶれして見えない）。
+        寸法は children 側の先頭アイコンと同じ 16px に揃え、loading 切替時のずれも防ぐ。
+      */}
+      {loading ? <Spinner size={16} /> : null}
       {children}
     </button>
   );

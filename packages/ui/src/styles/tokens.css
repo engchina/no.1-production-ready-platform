@@ -263,6 +263,18 @@ body {
   }
 }
 
+/*
+ * 回転アイコン（animate-spin）は原点を viewBox 中心（= 図形中心）へ固定し、
+ * 継続回転する要素として独立レイヤーで合成させる（毎フレームの再ラスタライズを避ける）。
+ * 「回転が中心からずれて見える」現象の主因は図形側（欠けた円弧はインクの重心が
+ * 角度ごとに動く）なので、スピナーには全周トラックを持つ Spinner を使うこと。
+ */
+svg.animate-spin {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

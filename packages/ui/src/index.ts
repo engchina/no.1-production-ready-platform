@@ -7,6 +7,7 @@ export { cn } from "./lib/utils";
 
 // --- UI primitives ---
 export { Button, buttonVariants, type ButtonProps } from "./components/ui/button";
+export { Spinner, type SpinnerProps } from "./components/ui/spinner";
 export {
   Card,
   CardHeader,
