@@ -36,6 +36,13 @@ describe("tokens CSS", () => {
     expect(read("tokens.css")).toMatch(/--text-xs:\s*var\(--font-size-xs\);/);
   });
 
+  it("サイドバー幅はトークンが正本で、日本語のナビ項目名が収まる 18rem（252px）", () => {
+    expect(read("tokens/spacing.css")).toMatch(/--sidebar-width:\s*18rem;/);
+    const sidebar = readFileSync(new URL("../src/components/app-shell/Sidebar.tsx", import.meta.url), "utf8");
+    expect(sidebar).toContain('"w-[var(--sidebar-width-collapsed)]" : "w-[var(--sidebar-width)]"');
+    expect(sidebar).not.toMatch(/\bw-60\b/);
+  });
+
   it("タッチ端末ではボタン高さを 44px にする", () => {
     expect(read("tokens/spacing.css")).toMatch(
       /@media \(pointer: coarse\) \{\s*:root \{\s*--button-height-sm: var\(--control-height-touch\);\s*--button-height-md: var\(--control-height-touch\);\s*--button-height-lg: var\(--control-height-touch\);/

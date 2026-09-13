@@ -23,8 +23,8 @@
   --card-padding: var(--space-5);    /* CardHeader p-5 pb-3 / CardContent p-5 pt-0 */
 
   /* app shell */
-  --sidebar-width: 15rem;            /* w-60 → 210px */
-  --sidebar-width-collapsed: 4rem;   /* w-16 → 56px */
+  --sidebar-width: 18rem;            /* 252px。日本語のナビ項目名（8〜10 文字）を省略せずに収める */
+  --sidebar-width-collapsed: 4rem;   /* 56px */
   --sidebar-header-height: 3.5rem;   /* h-14 */
   --nav-item-height: 2.75rem;        /* h-11 */
   --command-button-height: 2.25rem;
