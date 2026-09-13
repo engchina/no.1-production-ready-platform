@@ -179,12 +179,15 @@ readme が規定していた「左右ガター 2rem / セクション間 1.5rem�
 
 > **非同期の操作を起こすボタンは必ずアイコンを持つ。loading 中はアイコンがスピナーに置き換わる。**
 
-**API 変更:** `icon` プロップ（Lucide 名）を新設。**子要素に `<Icon>` を直接書かない。**
+**API 変更:** `icon` プロップ（`lucide-react` のコンポーネント。型は `LucideIcon`）を新設。**子要素にアイコンを直接書かない。**
+（Lucide 名の文字列で受ける方式は全アイコンをバンドルに含めるため採用しない。RAG 実測で JS +38%）
 
 ```jsx
-<Button variant="primary" icon="Upload">文書アップロード</Button>
-<Button variant="secondary" icon="RefreshCw" loading={reloading}>再読込</Button>
-<Button variant="ghost" iconOnly icon="Ellipsis" aria-label="その他の操作" />
+import { Ellipsis, RefreshCw, Upload } from "lucide-react";
+
+<Button variant="primary" icon={Upload}>文書アップロード</Button>
+<Button variant="secondary" icon={RefreshCw} loading={reloading}>再読込</Button>
+<Button variant="ghost" iconOnly icon={Ellipsis} aria-label="その他の操作" />
 ```
 
 **アイコンをいつ付けるか（role で決まる。好みで決めない）**
@@ -412,7 +415,7 @@ QA に事前共有してください。**13点あります。**
 
 | 対象 | 変更 |
 |---|---|
-| `Button` | `icon` / `trailingIcon` プロップ新設。子に `<Icon>` を書く旧スタイルは動くが**非推奨** |
+| `Button` | `icon` / `trailingIcon` プロップ新設。子にアイコンを書く旧スタイルは動くが**非推奨** |
 | `StatusBadge` | `icon` プロップ新設（既定 `true`）。`pending` は `warning` の別名で**非推奨** |
 | `PageHeader` | `tabs` / `wide` プロップ新設。アクションの並び順が変わる |
 | `.pr-icon-button` | **削除。** `<Button variant="ghost" iconOnly>` へ |

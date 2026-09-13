@@ -34,10 +34,16 @@ RAG / NL2SQL / Agent
 
 ### 2-1. スタイルの読み込み
 
-```ts
-// frontend/src/main.tsx
-import "@engchina/production-ready-ui/styles.css";
+```css
+/* frontend/src/globals.css */
+@import "tailwindcss";
+@import "@engchina/production-ready-ui/styles.css";
+@source "../node_modules/@engchina/production-ready-ui/dist";
 ```
+
+**`main.tsx` から JS で import しないでください。** `@tailwindcss/postcss` は JS から import した CSS を
+別の Tailwind ルートとして処理するため、トークン CSS の `@theme inline` と `@source` が `globals.css` 側に効かず、
+`bg-primary` 等の共有ユーティリティが生成されません（RAG で実測）。
 
 **そして各アプリの `globals.css` からトークン定義ブロックを削除します。**
 `:root { --primary: … }` や `.dark { … }` がアプリ側に残っていると二重管理になり、
@@ -66,7 +72,8 @@ document.documentElement.dataset.theme = "dark";   // "light" | "dark" | "auto"
 
 ### 2-3. アイコン
 
-`Icon` は Lucide を `currentColor` で描きます。アプリ側で `lucide-react@0.468` を
+アイコンは `lucide-react` のコンポーネントを props に渡します（`icon={Upload}`。型は `LucideIcon`）。
+`currentColor` で描かれ、寸法は `packages/ui` が 14 / 16 / 20 / 24px に固定します。アプリ側で `lucide-react@0.468` を
 依存に持ち、バージョンを `packages/ui` と揃えてください。**絵文字と手描き SVG は禁止です**
 （`Spinner` が唯一の自作グリフ）。
 
@@ -79,6 +86,7 @@ import {
   AppShell, Sidebar, PageHeader, PageBody, Section,
   Tabs, TabPanel, DataTable, Pagination, Button, StatusBadge,
 } from "@engchina/production-ready-ui";
+import { RefreshCw, Upload } from "lucide-react";
 
 export function DocumentIndexScreen() {
   const [view, setView] = useState("all");
@@ -91,8 +99,8 @@ export function DocumentIndexScreen() {
         title="文書インデックス"
         subtitle="アップロード済み文書の解析・索引状態を確認します。"
         actions={[
-          { id: "upload", kind: "primary",   label: "文書アップロード", icon: "Upload" },
-          { id: "reload", kind: "secondary", label: "再読込", icon: "RefreshCw", loading: reloading },
+          { id: "upload", kind: "primary",   label: "文書アップロード", icon: Upload },
+          { id: "reload", kind: "secondary", label: "再読込", icon: RefreshCw, loading: reloading },
         ]}
         tabs={
           <Tabs value={view} onChange={setView} items={[
@@ -166,7 +174,7 @@ const FILE_STATUS: Record<FileStatus, StatusBadgeProps["variant"]> = {
 | `loading` 中にラベルを「実行中…」に差し替える | ラベルは変えない。アイコンがスピナーに置き換わる |
 | **製品ごとのアクセント色を作る** | 製品は wordmark とナビと内容で区別する |
 | コンポーネント内部への直 import | パッケージのルートから import |
-| 絵文字・手描き SVG | Lucide の `Icon` |
+| 絵文字・手描き SVG | `lucide-react` のアイコン |
 
 ### lint で機械的に守る
 
@@ -210,10 +218,10 @@ const FILE_STATUS: Record<FileStatus, StatusBadgeProps["variant"]> = {
 
 ### 3アプリ共通
 
-1. `globals.css` のトークンブロックを削除し、`styles.css` を import
+1. `globals.css` のトークンブロックを削除し、`styles.css` を `globals.css` で `@import`（§2-1）
 2. 手書きの padding div を `PageBody` に置換
 3. `ToggleChip` のタブ流用を `Tabs` に置換
-4. ボタンを `icon` プロップに移行（子に `<Icon>` を書くのをやめる）
+4. ボタンを `icon` プロップに移行（`icon={Upload}`。子にアイコンを書くのをやめる）
 5. `StatusBadge` の `pending` を `warning` に置換
 6. `.pr-icon-button` の使用箇所を `<Button variant="ghost" iconOnly>` に置換
 
