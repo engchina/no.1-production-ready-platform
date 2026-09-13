@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { ChevronDown, PanelLeftClose, PanelLeftOpen, Search } from "lucide-react";
+import { ChevronDown, LogOut, Moon, PanelLeftClose, PanelLeftOpen, Search, Sun, UserRound } from "lucide-react";
 
 import { cn } from "../../lib/utils";
 import type { NavLinkComponent, NavSection, SidebarLabels } from "../../navigation/types";
@@ -87,10 +87,11 @@ export function Sidebar({
           aria-hidden={collapsed}
           title={title.full}
         >
-          <span className="block whitespace-nowrap text-base font-bold leading-5">
+          {/* 仕様の 16px は幅 240px 前提。実幅 15rem（210px）では折りたたみボタンに重なるため 14px。 */}
+          <span className="block truncate whitespace-nowrap text-sm font-bold leading-5">
             {title.line1}
           </span>
-          <span className="block whitespace-nowrap text-xs font-semibold leading-4 text-fg-muted">
+          <span className="block truncate whitespace-nowrap text-xs font-semibold leading-4 text-fg-muted">
             {title.line2}
           </span>
         </div>
@@ -102,7 +103,7 @@ export function Sidebar({
           title={collapsed ? labels.expand : labels.collapse}
           onClick={onToggleCollapsed}
         >
-          {collapsed ? <PanelLeftOpen size={18} aria-hidden /> : <PanelLeftClose size={18} aria-hidden />}
+          {collapsed ? <PanelLeftOpen size={20} aria-hidden /> : <PanelLeftClose size={20} aria-hidden />}
         </button>
       </div>
       <nav className={cn("flex-1 overflow-y-auto overflow-x-hidden py-3", collapsed ? "px-2" : "px-3")}>
@@ -223,7 +224,9 @@ export function Sidebar({
                             className={cn(
                               "relative flex h-11 min-h-11 items-center overflow-hidden rounded-md text-sm transition-colors",
                               collapsed ? "justify-center px-0" : "gap-2.5 px-3 py-2",
-                              active ? "bg-accent-emphasis text-fg-on-accent" : "hover:bg-surface-hover hover:text-fg"
+                              active
+                                ? "bg-accent-emphasis text-fg-on-accent forced-colors:bg-[Highlight] forced-colors:text-[HighlightText] forced-colors:forced-color-adjust-none"
+                                : "hover:bg-surface-hover hover:text-fg forced-colors:hover:bg-[Highlight] forced-colors:hover:text-[HighlightText]"
                             )}
                             aria-current={active ? "page" : undefined}
                             aria-label={ariaLabel}
@@ -236,7 +239,7 @@ export function Sidebar({
                                 aria-hidden
                               />
                             ) : null}
-                            <Icon className="shrink-0" size={18} aria-hidden />
+                            <Icon className="shrink-0" size={20} aria-hidden />
                             <span
                               className={cn(
                                 "sidebar-reveal min-w-0 truncate whitespace-nowrap leading-5",
@@ -263,6 +266,74 @@ export function Sidebar({
         </div>
       ) : null}
     </aside>
+  );
+}
+
+/**
+ * サイドバー下部のアカウント領域（ユーザー名・ロール・ログアウト・テーマ切替）。
+ * Sidebar の `footer` スロットに渡す。ラベルは翻訳済み文字列で上書きする。
+ */
+export function SidebarAccountFooter({
+  name,
+  roles,
+  collapsed,
+  theme,
+  onToggleTheme,
+  onLogout,
+  labels = { logout: "ログアウト", switchToLight: "ライトテーマに切り替え", switchToDark: "ダークテーマに切り替え" },
+}: {
+  name: string;
+  roles?: string;
+  collapsed: boolean;
+  /** 現在適用中のテーマ（system 設定の場合は解決後の値）。 */
+  theme: "light" | "dark";
+  onToggleTheme?: () => void;
+  onLogout?: () => void;
+  labels?: { logout: string; switchToLight: string; switchToDark: string };
+}) {
+  const row =
+    "flex h-11 min-h-11 cursor-pointer items-center gap-2.5 rounded-md text-sm transition-colors hover:bg-surface-hover hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring forced-colors:hover:bg-[Highlight] forced-colors:hover:text-[HighlightText]";
+  const themeLabel = theme === "dark" ? labels.switchToLight : labels.switchToDark;
+  return (
+    <div className="grid gap-1">
+      {collapsed ? null : (
+        <div className="flex min-h-11 items-center gap-2.5 px-3 py-2" title={roles ? `${name}（${roles}）` : name}>
+          <UserRound className="shrink-0" size={20} aria-hidden />
+          <div className="min-w-0">
+            <div className="truncate text-sm font-medium text-fg">{name}</div>
+            {roles ? <div className="truncate text-xs text-fg-subtle">{roles}</div> : null}
+          </div>
+        </div>
+      )}
+      <div className={cn("flex gap-1", collapsed && "flex-col")}>
+        {onLogout ? (
+          <SidebarTooltip label={labels.logout} enabled={collapsed}>
+            <button
+              type="button"
+              onClick={onLogout}
+              aria-label={collapsed ? labels.logout : undefined}
+              className={cn(row, "w-full flex-1", collapsed ? "justify-center px-0" : "justify-start px-3")}
+            >
+              <LogOut className="shrink-0" size={20} aria-hidden />
+              {collapsed ? null : <span className="truncate">{labels.logout}</span>}
+            </button>
+          </SidebarTooltip>
+        ) : null}
+        {onToggleTheme ? (
+          <SidebarTooltip label={themeLabel} enabled={collapsed}>
+            <button
+              type="button"
+              onClick={onToggleTheme}
+              aria-label={themeLabel}
+              title={collapsed ? undefined : themeLabel}
+              className={cn(row, "justify-center border border-border px-0", collapsed ? "w-full" : "w-11")}
+            >
+              {theme === "dark" ? <Sun size={20} aria-hidden /> : <Moon size={20} aria-hidden />}
+            </button>
+          </SidebarTooltip>
+        ) : null}
+      </div>
+    </div>
   );
 }
 

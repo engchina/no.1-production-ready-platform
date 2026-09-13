@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronsUpDown, ChevronUp } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { cn } from "../../lib/utils";
@@ -94,21 +94,27 @@ export function DataTable<T>({
               const alignClass = column.align ? ALIGN_CLASS[column.align] : "text-left";
               if (column.sortable && onSortChange) {
                 const active = sort?.key === column.key;
-                const Icon = !active ? ChevronsUpDown : sort?.direction === "asc" ? ChevronUp : ChevronDown;
+                const Icon = !active ? ArrowUpDown : sort?.direction === "asc" ? ArrowUp : ArrowDown;
                 return (
                   <th
                     key={column.key}
                     scope="col"
                     aria-sort={ariaSortValue(sort, column.key)}
-                    className={cn(cellPad, alignClass, "font-semibold", column.headerClassName)}
+                    className={cn("p-0", alignClass, "font-semibold", column.headerClassName)}
                   >
+                    {/* 当たり判定は <th> 全体（文字高だけのボタンは 24px の最小タップ領域を割る）。 */}
                     <button
                       type="button"
                       onClick={() => toggleSort(column.key)}
-                      className="inline-flex cursor-pointer items-center gap-1 text-fg-muted hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+                      className={cn(
+                        cellPad,
+                        "flex w-full cursor-pointer items-center gap-1 font-semibold transition-colors hover:bg-surface-hover hover:text-fg focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus-ring forced-colors:hover:bg-[Highlight] forced-colors:hover:text-[HighlightText]",
+                        column.align === "right" ? "justify-end" : column.align === "center" ? "justify-center" : "justify-start",
+                        active ? "text-fg" : "text-fg-muted"
+                      )}
                     >
                       <span>{column.header}</span>
-                      <Icon size={13} aria-hidden="true" className={active ? "text-fg" : "text-fg-muted"} />
+                      <Icon size={14} className="shrink-0" aria-hidden="true" />
                     </button>
                   </th>
                 );
@@ -148,7 +154,7 @@ export function DataTable<T>({
                       ? column.render(row, index)
                       : String((row as Record<string, unknown>)[column.key] ?? "");
                     return (
-                      <td key={column.key} className={cn(cellPad, alignClass, "break-words", column.className)}>
+                      <td key={column.key} className={cn(cellPad, alignClass, column.className)}>
                         {content}
                       </td>
                     );

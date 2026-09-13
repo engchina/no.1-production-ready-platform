@@ -178,7 +178,7 @@ function ConfirmDialog({
               tone === "info" && "bg-info-subtle text-info-fg"
             )}
           >
-            <Icon size={18} aria-hidden />
+            <Icon size={20} aria-hidden />
           </span>
           <div className="min-w-0 flex-1">
             <h2 id="confirm-title" className="text-base font-semibold text-fg">

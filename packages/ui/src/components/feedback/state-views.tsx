@@ -42,9 +42,8 @@ export function ErrorState({
         <MessageText text={message} />
       </p>
       {onRetry ? (
-        <Button type="button" variant="secondary" size="sm" onClick={onRetry}>
-          <RefreshCw size={14} aria-hidden />
-          {retryLabel}
+        <Button type="button" variant="secondary" size="sm" icon={RefreshCw} onClick={onRetry}>
+          <span>{retryLabel}</span>
         </Button>
       ) : null}
     </div>
@@ -63,7 +62,7 @@ export function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center gap-1 py-10 text-center">
-      <Inbox size={22} className="text-fg-muted" aria-hidden />
+      <Inbox size={24} className="text-fg-muted" aria-hidden />
       <p className="mt-1 text-sm leading-relaxed text-fg">
         <MessageText text={title} />
       </p>

@@ -191,8 +191,8 @@ export function SelectField<T extends string>({
           onClick={() => (open ? closeList() : openList())}
           onKeyDown={handleKeyDown}
           className={cn(
-            "flex h-10 w-full cursor-pointer items-center justify-between gap-3 rounded-md border bg-surface px-3 text-left text-sm text-fg outline-none transition-colors",
-            "hover:bg-surface-hover focus-visible:border-focus-ring focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus-ring",
+            "flex h-[var(--field-height)] w-full cursor-pointer items-center justify-between gap-3 rounded-md border bg-surface px-3 text-left text-sm text-fg outline-none transition-colors",
+            "hover:bg-surface-hover forced-colors:border-[CanvasText] focus-visible:border-focus-ring focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus-ring",
             error ? "border-danger-fg" : "border-border-control",
             buttonClassName
           )}
@@ -241,7 +241,7 @@ export function SelectField<T extends string>({
                   )}
                 >
                   <Check
-                    size={15}
+                    size={16}
                     className={cn("shrink-0 text-accent-fg-strong", selected ? "opacity-100" : "opacity-0")}
                     aria-hidden
                   />

@@ -50,7 +50,7 @@ export function Breadcrumbs({
               </li>
               {!isLast ? (
                 <li aria-hidden className="flex items-center text-fg-subtle">
-                  <ChevronRight size={13} />
+                  <ChevronRight size={14} />
                 </li>
               ) : null}
             </Fragment>

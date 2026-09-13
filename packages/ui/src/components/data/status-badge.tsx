@@ -1,3 +1,13 @@
+import {
+  CircleAlert,
+  CircleCheck,
+  History,
+  Info,
+  type LucideIcon,
+  Minus,
+  TriangleAlert,
+} from "lucide-react";
+
 import { cn } from "../../lib/utils";
 
 /**
@@ -8,38 +18,58 @@ import { cn } from "../../lib/utils";
 export type StatusVariant =
   | "neutral"
   | "info"
+  /** @deprecated 旧実装で warning と完全に同値だった。warning を使うこと。 */
   | "pending"
   | "success"
   | "warning"
   | "danger";
 
 const VARIANT_STYLES: Record<StatusVariant, string> = {
-  neutral: "bg-slate-100 text-slate-700",
-  info: "bg-sky-100 text-sky-700",
-  pending: "bg-amber-100 text-amber-700",
-  success: "bg-emerald-100 text-emerald-700",
-  warning: "bg-yellow-100 text-yellow-800",
-  danger: "bg-red-100 text-red-700",
+  neutral: "border-border-control bg-surface text-fg-muted",
+  info: "border-info-border bg-info-subtle text-info-fg",
+  pending: "border-warning-border bg-warning-subtle text-warning-fg",
+  success: "border-success-border bg-success-subtle text-success-fg",
+  warning: "border-warning-border bg-warning-subtle text-warning-fg",
+  danger: "border-danger-border bg-danger-subtle text-danger-fg",
 };
 
-/** ステータスバッジ（状態を色＋ラベルで表示）。ラベルは i18n 済み文字列を渡す。 */
+/*
+ * 状態は色だけで表さない。success #047857 と danger #b91c1c は輝度がほぼ同じで
+ * 1型・2型色覚では見分けられないため、形（アイコン）で冗長に符号化する。強制カラーモードでも意味が残る。
+ */
+const VARIANT_ICON: Record<StatusVariant, LucideIcon> = {
+  neutral: Minus,
+  info: Info,
+  pending: History,
+  success: CircleCheck,
+  warning: TriangleAlert,
+  danger: CircleAlert,
+};
+
+/** ステータスバッジ（アイコン + ラベル）。ラベルは i18n 済み文字列を渡す。 */
 export function StatusBadge({
   variant,
   label,
+  icon = true,
   className,
 }: {
   variant: StatusVariant;
   label: string;
+  /** 既定 true（バリアント既定のアイコン）。LucideIcon で上書き、false で非表示。 */
+  icon?: boolean | LucideIcon;
   className?: string;
 }) {
+  const Icon = icon === true ? VARIANT_ICON[variant] : icon || null;
   return (
     <span
+      data-status-variant={variant}
       className={cn(
-        "inline-flex items-center justify-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium",
+        "inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-medium",
         VARIANT_STYLES[variant],
         className
       )}
     >
+      {Icon ? <Icon size={14} className="shrink-0" aria-hidden /> : null}
       {label}
     </span>
   );
