@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { AppShell } from "../src/components/app-shell/AppShell";
 import { PageBody, Section } from "../src/components/app-shell/PageBody";
-import { orderActions, PageHeader } from "../src/components/app-shell/PageHeader";
+import { nextMenuIndex, orderActions, PageHeader, splitCompactActions } from "../src/components/app-shell/PageHeader";
 import { StatusBadge } from "../src/components/data/status-badge";
 import { Button } from "../src/components/ui/button";
 import { nextTabId, Tabs } from "../src/components/ui/tabs";
@@ -49,6 +49,28 @@ describe("Tabs のバッジ", () => {
 });
 
 describe("PageHeader", () => {
+  it("狭い画面では主操作 1 つだけを見せ、danger は常にメニューに入れる", () => {
+    const a = (id: string, kind: "primary" | "secondary" | "utility" | "danger") => ({ id, kind, label: id });
+    const ids = (r: ReturnType<typeof splitCompactActions>) => [r.visible.map((x) => x.id), r.overflow.map((x) => x.id)];
+    expect(ids(splitCompactActions([a("del", "danger"), a("new", "primary"), a("reload", "utility"), a("import", "secondary")]))).toEqual([
+      ["new"],
+      ["import", "reload", "del"],
+    ]);
+    expect(ids(splitCompactActions([a("reload", "utility"), a("import", "secondary")]))).toEqual([["import"], ["reload"]]);
+    expect(ids(splitCompactActions([a("del", "danger"), a("del2", "danger")]))).toEqual([[], ["del", "del2"]]);
+    expect(ids(splitCompactActions([a("del", "danger")]))).toEqual([["del"], []]);
+  });
+
+  it("メニューは ↓ ↑ で循環し、Home / End で端へ移動する", () => {
+    expect(nextMenuIndex("ArrowDown", 2, 3)).toBe(0);
+    expect(nextMenuIndex("ArrowDown", -1, 3)).toBe(0);
+    expect(nextMenuIndex("ArrowUp", 0, 3)).toBe(2);
+    expect(nextMenuIndex("Home", 2, 3)).toBe(0);
+    expect(nextMenuIndex("End", 0, 3)).toBe(2);
+    expect(nextMenuIndex("a", 0, 3)).toBeNull();
+    expect(nextMenuIndex("ArrowDown", 0, 0)).toBeNull();
+  });
+
   it("アクションを danger → utility → secondary → primary に並べ、同じ kind は渡した順を保つ", () => {
     const ordered = orderActions([
       { id: "save", kind: "primary", label: "保存" },
