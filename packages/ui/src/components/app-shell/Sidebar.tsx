@@ -251,7 +251,7 @@ export function Sidebar({
 function navRowClass(collapsed: boolean, active: boolean) {
   return cn(
     "relative flex h-11 min-h-11 w-full items-center overflow-hidden rounded-md text-sm transition-colors",
-    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring",
+    // フォーカスリングは base.css の :focus-visible（コントラスト優先設定で太くなる）に任せる
     collapsed ? "justify-center px-0" : "gap-2.5 px-3 py-2 text-left",
     active
       ? "bg-accent-emphasis text-fg-on-accent forced-colors:bg-[Highlight] forced-colors:text-[HighlightText] forced-colors:forced-color-adjust-none"
@@ -359,7 +359,7 @@ export function SidebarAccountFooter({
                   onClick={onToggleTheme}
                   aria-label={themeLabel}
                   title={themeLabel}
-                  className="flex h-11 min-h-11 w-11 cursor-pointer items-center justify-center rounded-md border border-border transition-colors hover:bg-surface-hover hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring forced-colors:hover:bg-[Highlight] forced-colors:hover:text-[HighlightText]"
+                  className="flex h-11 min-h-11 w-11 cursor-pointer items-center justify-center rounded-md border border-border transition-colors hover:bg-surface-hover hover:text-fg forced-colors:hover:bg-[Highlight] forced-colors:hover:text-[HighlightText]"
                 >
                   {theme === "dark" ? <Sun size={20} aria-hidden /> : <Moon size={20} aria-hidden />}
                 </button>
