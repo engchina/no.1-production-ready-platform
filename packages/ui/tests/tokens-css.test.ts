@@ -11,7 +11,14 @@ describe("tokens CSS", () => {
   });
 
   it("意味トークンを color-scheme を切り替える要素すべてで宣言し直す（Lightning CSS 変換後もスコープ内でダーク値になる）", () => {
-    expect(colors).toMatch(/:root, \.light, \.dark, \[data-theme\], \[data-surface\] \{\s*--font-sans/);
+    expect(colors).toMatch(/:root, \[data-theme\], \[data-surface\] \{\s*--font-sans/);
+  });
+
+  it("テーマ class（.light / .dark）はルート要素でだけ効く（外部ライブラリの同名 class に反応しない）", () => {
+    for (const css of [colors, read("tokens/a11y.css")]) {
+      expect(css.replace(/\/\*[\s\S]*?\*\//g, "")).not.toMatch(/(^|[\s,])\.(light|dark)\b/m);
+    }
+    expect(colors).toMatch(/:root\.dark \{ color-scheme: dark; \}/);
   });
 
   it("文字は px、ルートは 14px のまま（余白の rem を動かさない）", () => {

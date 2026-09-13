@@ -15,20 +15,22 @@
        <html class="dark">          → 旧 API（互換のため維持）
 
    .light / .dark は既存 3 アプリが使っている旧 API です。新規コードは data-theme を使うこと。
+   .light / .dark はルート要素（<html>）でだけ効きます。外部ライブラリの同名 class（React Flow の
+   .react-flow.light 等）でテーマが切り替わらないようにするためです。部分テーマは data-theme を使うこと。
 
    面のスコープ（TIER 2.5）は下部の [data-surface] を参照。
    ───────────────────────────────────────────────────────────────────────── */
 
 :root { color-scheme: light; }
-[data-theme="light"], .light { color-scheme: light; }
-[data-theme="dark"], .dark { color-scheme: dark; }
+[data-theme="light"], :root.light { color-scheme: light; }
+[data-theme="dark"], :root.dark { color-scheme: dark; }
 [data-theme="auto"]  { color-scheme: light dark; }
 
 /* light-dark() を含むトークンは、color-scheme を切り替えるすべての要素で宣言し直す。
    アプリの Tailwind ビルド（Lightning CSS）は light-dark() を --lightningcss-light/dark 変数に変換し、
    値が「宣言した要素」で確定してから継承される。:root だけで宣言すると [data-surface] の内側で
    上書きしていないトークンがライト値のまま残るため。 */
-:root, .light, .dark, [data-theme], [data-surface] {
+:root, [data-theme], [data-surface] {
   --font-sans: "Noto Sans JP", "Roboto", system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   /* ponytail: --font-mono（Google Sans Code）は RAG / Agent が書体を自前ホストしておらず、font-mono が
      プロポーショナルの Noto Sans JP に落ちるため未定義のまま。各アプリが @fontsource を入れる PR 5 で定義する。 */
@@ -118,7 +120,7 @@
    [data-surface="inverted"]（color-scheme: dark）の内側で参照されるため light-dark() では書けない
    （常にダーク値になる）。外側のテーマで確定値にし、スコープで宣言し直さないよう :root 系だけに置く。 */
 :root { --color-sidebar: var(--blue-850); --color-code-canvas: var(--blue-900); }
-[data-theme="dark"], .dark { --color-sidebar: var(--neutral-1000); }
+[data-theme="dark"], :root.dark { --color-sidebar: var(--neutral-1000); }
 @media (prefers-color-scheme: dark) {
   [data-theme="auto"] { --color-sidebar: var(--neutral-1000); }
 }

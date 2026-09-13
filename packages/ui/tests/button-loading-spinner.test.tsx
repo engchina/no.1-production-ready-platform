@@ -36,6 +36,8 @@ describe("Spinner", () => {
     const classes = classesOf(html, "<svg");
     expect(classes).toContain("animate-spin");
     expect(classes).toContain("motion-reduce:animate-none");
+    // flex 内で長いラベルに押されて縮まない
+    expect(classes).toContain("shrink-0");
     expect(html).toContain('aria-hidden="true"');
   });
 
