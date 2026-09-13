@@ -96,14 +96,14 @@ Issue の要点と、この変更が必要な理由を記載する。bug fix で
 ### 禁止事項
 
 - 生の hex（`#1a73c1` 等）と生の px を書く。トークンを `var()` で参照する。
-- 業務 repo の `globals.css` に色トークンを定義する。`@engchina/production-ready-ui/styles.css` を import する。
+- 業務 repo の `globals.css` に色トークンを定義する。`globals.css` で `@import "tailwindcss"` の後に `@import "@engchina/production-ready-ui/styles.css"` する（`main.tsx` から JS で import すると共有ユーティリティが生成されない）。
 - `TextField` / `PageHeader` / ボタン等の共有コンポーネントを再実装する。
 - `<table>` を手書きする。`DataTable` を使う。
 - `<div style={{ padding: "1.5rem 2rem" }}>` のような余白コンテナを手書きする。`PageBody` を使う。
 - `ToggleChip` をタブ代わりに使う。タブ＝ビュー切替は `Tabs`、チップ＝データの絞り込みは `ToggleChip`。
 - `loading` 中にボタンのラベルを「実行中…」等に差し替える。ラベルは変えず、先頭アイコンがスピナーに置き換わる。
 - **製品ごとのアクセント色を作る。** 製品は wordmark・ナビ・内容で区別する。
-- 絵文字と手描き SVG。アイコンは Lucide を `Icon` 経由で使う。
+- 絵文字と手描き SVG。アイコンは `lucide-react` のコンポーネントを使い、共有コンポーネントには `icon={Upload}` のように `LucideIcon` として渡す（Lucide 名の文字列では渡さない）。
 - コンポーネント内部パス（`components/core/**` 等）への直 import。パッケージのルートから import する。
 
 ### 画面の構成

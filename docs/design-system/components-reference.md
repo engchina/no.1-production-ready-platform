@@ -6,6 +6,8 @@
 
 対応する仕様は `README.md` の §4（柱 C）を参照。
 
+> **アイコンの読み替え（packages/ui の決定）:** 下の JSX は Lucide 名の文字列と `<Icon name="…" />` で書かれていますが、`packages/ui` ではアイコン props を **`LucideIcon`（`lucide-react` のコンポーネントそのもの）** で受けます。`icon="Upload"` → `icon={Upload}`、`<Icon name="Upload" size={16} />` → `<Upload size={16} aria-hidden />` と読み替えてください。文字列から引く方式は全アイコンをバンドルに含めるため採用しません（RAG 実測で JS +38%）。サイズは 14 / 16 / 20 / 24 の4値のみで、Sidebar の `size={18}` は `20` と読み替えます。
+
 ---
 
 ## Tabs.jsx — **新規**
@@ -96,9 +98,10 @@ export function TabPanel({ id, value, children, style }) {
 
 ```ts
 import * as React from "react";
+import type { LucideIcon } from "lucide-react";
 
 export interface TabsProps {
-  items: { id: string; label: string; icon?: string; count?: number; disabled?: boolean }[];
+  items: { id: string; label: string; icon?: LucideIcon; count?: number; disabled?: boolean }[];
   value: string;
   onChange?: (id: string) => void;
   ariaLabel?: string;
@@ -314,12 +317,13 @@ export function PageHeader({ title, subtitle, status, breadcrumbs, actions = [],
 
 ```ts
 import * as React from "react";
+import type { LucideIcon } from "lucide-react";
 
 export interface PageHeaderProps {
   title: string; subtitle?: string; status?: React.ReactNode;
   breadcrumbs?: { label: string; href?: string }[];
   /** 並びは danger → utility → secondary → primary（右端が primary）。 */
-  actions?: { id: string; kind: "primary" | "secondary" | "utility" | "danger"; label?: string; ariaLabel?: string; icon?: string; onClick?: () => void; loading?: boolean; disabled?: boolean }[];
+  actions?: { id: string; kind: "primary" | "secondary" | "utility" | "danger"; label?: string; ariaLabel?: string; icon?: LucideIcon; onClick?: () => void; loading?: boolean; disabled?: boolean }[];
   /** <Tabs> を渡すとヘッダー下端に吸い付く。ビュー切替の唯一の置き場所。 */
   tabs?: React.ReactNode;
   /** PageBody の wide と必ず同じ値にする。ずらすと本文と左端が揃わない。 */
@@ -418,14 +422,15 @@ export function Button({
 
 ```ts
 import * as React from "react";
+import type { LucideIcon } from "lucide-react";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "ghost" | "danger";
   size?: "sm" | "md" | "lg";
-  /** 先頭アイコンの Lucide 名。子要素に <Icon> を直接書かない。 */
-  icon?: string;
+  /** 先頭アイコン（lucide-react のコンポーネント。例: icon={Upload}）。子要素にアイコンを直接書かない。 */
+  icon?: LucideIcon;
   /** 方向・開閉・外部リンクのみ（ChevronRight / ChevronDown / ExternalLink）。 */
-  trailingIcon?: string;
+  trailingIcon?: LucideIcon;
   iconOnly?: boolean;
   touchTarget?: boolean;
   tone?: "default" | "danger";
@@ -504,12 +509,13 @@ export function StatusBadge({ variant = "neutral", label, icon = true, style }) 
 
 ```ts
 import * as React from "react";
+import type { LucideIcon } from "lucide-react";
 
 export interface StatusBadgeProps {
   variant: "neutral" | "info" | "success" | "warning" | "danger" | /** @deprecated warning と同値 */ "pending";
   label: string;
-  /** 既定 true（バリアント既定のアイコン）。Lucide 名で上書き、false で非表示。 */
-  icon?: boolean | string;
+  /** 既定 true（バリアント既定のアイコン）。LucideIcon で上書き、false で非表示。 */
+  icon?: boolean | LucideIcon;
   style?: React.CSSProperties;
 }
 
