@@ -98,14 +98,14 @@ export function Pagination({
           type="button"
           variant="secondary"
           size="sm"
+          icon={ChevronLeft}
           disabled={page <= 1}
           onClick={() => onPageChange(Math.max(1, page - 1))}
         >
-          <ChevronLeft size={15} aria-hidden="true" />
           <span>{prevLabel}</span>
         </Button>
         {pageIndicator ? (
-          <span className="tnum inline-flex min-h-8 items-center rounded-md border border-border px-3 text-fg">
+          <span className="tnum inline-flex min-h-[var(--button-height-sm)] items-center rounded-[var(--button-radius)] border border-border-control px-3 text-fg">
             {pageIndicator}
           </span>
         ) : null}
@@ -113,11 +113,11 @@ export function Pagination({
           type="button"
           variant="secondary"
           size="sm"
+          trailingIcon={ChevronRight}
           disabled={page >= totalPages}
           onClick={() => onPageChange(Math.min(totalPages, page + 1))}
         >
           <span>{nextLabel}</span>
-          <ChevronRight size={15} aria-hidden="true" />
         </Button>
       </div>
     </nav>

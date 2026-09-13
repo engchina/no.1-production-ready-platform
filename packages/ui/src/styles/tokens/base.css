@@ -179,3 +179,23 @@ svg.animate-spin {
     transition-delay: 0ms !important;
   }
 }
+
+/* 本文へスキップ（AppShell が出力）。サイドバーの項目数が多いため、キーボード利用者が nav を飛ばせるようにする。 */
+.pr-skip-link {
+  position: absolute;
+  left: var(--space-2);
+  top: var(--space-2);
+  z-index: var(--z-sticky);
+  transform: translateY(-200%);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-overlay);
+  color: var(--color-fg);
+  box-shadow: var(--shadow-lg);
+  font: var(--text-label);
+  text-decoration: none;
+}
+
+.pr-skip-link:focus-visible {
+  transform: none;
+}

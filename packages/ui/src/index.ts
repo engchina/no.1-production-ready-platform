@@ -7,6 +7,8 @@ export { cn } from "./lib/utils";
 
 // --- UI primitives ---
 export { Button, buttonVariants, type ButtonProps } from "./components/ui/button";
+export { Tabs, TabPanel, type TabItem, type TabsProps } from "./components/ui/tabs";
+export { TextField } from "./components/ui/text-field";
 export { Spinner, type SpinnerProps } from "./components/ui/spinner";
 export {
   Card,
@@ -70,8 +72,9 @@ export {
 
 // --- app shell / layout ---
 export { AppShell } from "./components/app-shell/AppShell";
-export { Sidebar, type SidebarProps } from "./components/app-shell/Sidebar";
-export { PageHeader } from "./components/app-shell/PageHeader";
+export { Sidebar, SidebarAccountFooter, type SidebarProps } from "./components/app-shell/Sidebar";
+export { PageHeader, type PageHeaderAction } from "./components/app-shell/PageHeader";
+export { PageBody, Section } from "./components/app-shell/PageBody";
 export {
   Breadcrumbs,
   type BreadcrumbItem,
