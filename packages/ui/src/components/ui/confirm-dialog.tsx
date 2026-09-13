@@ -3,6 +3,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useId,
   useRef,
   useState,
   type ReactNode,
@@ -19,6 +20,7 @@ import { MessageText } from "./message-text";
  * ConfirmDialog（確認ダイアログ）。
  * 破壊的・不可逆操作の確認ゲート。`useConfirm()` で Promise<boolean> を await する。
  * フォーカストラップ / Esc キャンセル / トリガーへフォーカス復帰に対応。
+ * メニュー（`role="menu"`）の項目から開いた場合は、閉じたあとメニューのトリガーへ戻す（WAI-ARIA Menu Button）。
  *
  * 既定のボタン文言は日本語。アプリ側の i18n を使うときは <ConfirmProvider labels={...}> で注入する。
  */
@@ -58,20 +60,44 @@ export function useConfirm(): ConfirmFn {
 interface DialogState {
   options: ConfirmOptions;
   resolve: (value: boolean) => void;
+  returnFocus: HTMLElement | null;
+}
+
+/**
+ * 閉じたあとのフォーカスの戻り先。`confirm()` の呼び出し時点で決める
+ * （メニュー項目はダイアログが開く前に unmount されるため、マウント時の activeElement では body になる）。
+ * メニューの中から開いた場合は、`aria-controls` でそのメニューを指すトリガーへ戻す。
+ */
+function confirmReturnFocus(active: Element | null): HTMLElement | null {
+  if (!(active instanceof HTMLElement)) return null;
+  const menu = active.closest<HTMLElement>('[role="menu"]');
+  if (menu?.id) {
+    const trigger = Array.from(document.querySelectorAll<HTMLElement>("[aria-controls]")).find(
+      (element) => element.getAttribute("aria-controls") === menu.id
+    );
+    if (trigger) return trigger;
+  }
+  return active;
 }
 
 export function ConfirmProvider({
   children,
   labels = DEFAULT_LABELS,
+  navigationKey,
 }: {
   children: ReactNode;
   labels?: ConfirmDefaultLabels;
+  /**
+   * 画面遷移の識別子（React Router の `useLocation().key` など）。値が変わると開いている確認を
+   * キャンセル（`false`）で閉じる。遷移先の画面に前の画面の確認が残らないようにする。
+   */
+  navigationKey?: unknown;
 }) {
   const [state, setState] = useState<DialogState | null>(null);
 
   const confirm = useCallback<ConfirmFn>((options) => {
     return new Promise<boolean>((resolve) => {
-      setState({ options, resolve });
+      setState({ options, resolve, returnFocus: confirmReturnFocus(document.activeElement) });
     });
   }, []);
 
@@ -82,12 +108,17 @@ export function ConfirmProvider({
     });
   }, []);
 
+  useEffect(() => {
+    settle(false);
+  }, [navigationKey, settle]);
+
   return (
     <ConfirmContext.Provider value={confirm}>
       {children}
       {state ? (
         <ConfirmDialog
           options={state.options}
+          returnFocus={state.returnFocus}
           labels={labels}
           onCancel={() => settle(false)}
           onConfirm={() => settle(true)}
@@ -99,31 +130,29 @@ export function ConfirmProvider({
 
 function ConfirmDialog({
   options,
+  returnFocus,
   labels,
   onCancel,
   onConfirm,
 }: {
   options: ConfirmOptions;
+  returnFocus: HTMLElement | null;
   labels: ConfirmDefaultLabels;
   onCancel: () => void;
   onConfirm: () => void;
 }) {
   const { title, description, tone = "danger", dismissOnOverlay = true } = options;
+  const titleId = useId();
+  const descriptionId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const confirmRef = useRef<HTMLButtonElement>(null);
-  const previouslyFocused = useRef<Element | null>(null);
   const Icon = toneIcon[tone];
 
-  // 開いたら確認ボタンへフォーカス、閉じたらトリガーへ復帰。
+  // 開いたら確認ボタンへフォーカス、閉じたらトリガーへ復帰。ダイアログは fixed なので本文をスクロールさせない。
   useEffect(() => {
-    previouslyFocused.current = document.activeElement;
-    confirmRef.current?.focus();
-    return () => {
-      if (previouslyFocused.current instanceof HTMLElement) {
-        previouslyFocused.current.focus();
-      }
-    };
-  }, []);
+    confirmRef.current?.focus({ preventScroll: true });
+    return () => returnFocus?.focus({ preventScroll: true });
+  }, [returnFocus]);
 
   // Esc でキャンセル + 簡易フォーカストラップ。
   useEffect(() => {
@@ -142,10 +171,10 @@ function ConfirmDialog({
       const last = focusable[focusable.length - 1];
       if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
-        last.focus();
+        last.focus({ preventScroll: true });
       } else if (!event.shiftKey && document.activeElement === last) {
         event.preventDefault();
-        first.focus();
+        first.focus({ preventScroll: true });
       }
     }
     document.addEventListener("keydown", onKeyDown);
@@ -165,9 +194,9 @@ function ConfirmDialog({
         ref={panelRef}
         role="alertdialog"
         aria-modal="true"
-        aria-labelledby="confirm-title"
-        aria-describedby={description ? "confirm-desc" : undefined}
-        className="animate-dialog-in w-full max-w-md rounded-xl border border-border bg-surface-overlay p-5 shadow-[var(--shadow-dialog)]"
+        aria-labelledby={titleId}
+        aria-describedby={description ? descriptionId : undefined}
+        className="animate-dialog-in max-h-[90dvh] w-full max-w-md overflow-auto rounded-xl border border-border bg-surface-overlay p-5 shadow-[var(--shadow-dialog)]"
       >
         <div className="flex items-start gap-3">
           <span
@@ -181,21 +210,21 @@ function ConfirmDialog({
             <Icon size={20} aria-hidden />
           </span>
           <div className="min-w-0 flex-1">
-            <h2 id="confirm-title" className="text-base font-semibold text-fg">
+            <h2 id={titleId} className="text-base font-semibold text-fg">
               <MessageText text={title} />
             </h2>
             {description ? (
-              <p id="confirm-desc" className="mt-1 text-sm leading-relaxed text-fg-muted">
+              <p id={descriptionId} className="mt-1 text-sm leading-relaxed text-fg-muted">
                 <MessageText text={description} />
               </p>
             ) : null}
           </div>
         </div>
         <div className="mt-5 flex justify-end gap-2">
-          <Button variant="secondary" size="sm" onClick={onCancel}>
+          <Button type="button" variant="secondary" size="sm" onClick={onCancel}>
             {options.cancelLabel ?? labels.cancel}
           </Button>
-          <Button ref={confirmRef} variant={confirmVariant} size="sm" onClick={onConfirm}>
+          <Button type="button" ref={confirmRef} variant={confirmVariant} size="sm" onClick={onConfirm}>
             {options.confirmLabel ?? labels.confirm}
           </Button>
         </div>

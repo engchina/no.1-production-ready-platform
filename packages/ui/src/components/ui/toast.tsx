@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { cn } from "../../lib/utils";
 import { useToastStore, type ToastItem } from "../../store/toast-store";
 
+import { Button } from "./button";
 import { toneIcon, toneRole, toneText } from "./feedback-tone";
 import { MessageText } from "./message-text";
 
@@ -18,6 +19,9 @@ export interface ToasterProps {
  * Toast 表示領域（既定は画面右下スタック）。
  * フォーカスを奪わず aria-live で読み上げる（toast-accessibility）。
  * アプリ最上位で一度だけ描画する。
+ *
+ * 重なり順はモーダルの下（`--z-toast` < `--z-scrim` < `--z-dialog`）。モーダル中はモーダル外を操作できないため、
+ * 通知を上に重ねても押せず、確認ダイアログのボタンを覆うだけになる。
  *
  * 閉じるボタンの aria ラベルは `dismissLabel` で注入（既定「閉じる」）。
  */
@@ -74,26 +78,31 @@ function ToastCard({ item, dismissLabel }: { item: ToastItem; dismissLabel: stri
           </p>
         ) : null}
         {item.action ? (
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={() => {
               item.action?.onClick();
               dismiss(item.id);
             }}
-            className="mt-1.5 cursor-pointer text-xs font-medium text-accent-fg hover:underline"
+            className="mt-1.5"
           >
             {item.action.label}
-          </button>
+          </Button>
         ) : null}
       </div>
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="sm"
+        iconOnly
+        touchTarget
+        icon={X}
         onClick={() => dismiss(item.id)}
         aria-label={dismissLabel}
-        className="-mr-2 -mt-2 inline-flex h-[44px] w-[44px] min-h-[44px] min-w-[44px] shrink-0 cursor-pointer items-center justify-center rounded-md text-fg-muted transition-colors hover:bg-surface-hover hover:text-fg"
-      >
-        <X size={14} aria-hidden />
-      </button>
+        className="-mr-2 -mt-2 text-fg-muted hover:enabled:text-fg"
+      />
     </div>
   );
 }
