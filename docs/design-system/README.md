@@ -16,7 +16,7 @@
 |---|---|---|
 | `ARCHITECTURE.md` | **3アプリがこの DS をどう使うかの契約書。3チーム全員が読む** | 最初にこれを読む |
 | `css/` | design system の**実ソース**（プレーン CSS） | `packages/ui/src/styles/` に**ほぼそのまま移植できます** |
-| `adherence.oxlintrc.json` | 生の hex / 生の px / 内部パス直 import を警告する lint ルール | 各 repo の `.oxlintrc.json` に取り込む |
+| `adherence.oxlintrc.json` + `design-system-plugin.mjs` | 生の hex / inline style の生の px / 書体 / 型・角丸の任意値 / 旧トークン名 / 内部パス import / loading 中のラベル差し替えを検出する lint ルール | 各 repo の lint 設定から sibling パスで参照する（`AGENTS.md`「lint」節） |
 | `components-reference.md` | 新規・変更されたコンポーネントの**参照実装**（React + インラインスタイル） | **そのまま出荷しない。** `packages/ui` の既存 `.tsx` / Tailwind の書き方に合わせて書き直す |
 | `reference/` | **目視確認用の HTML** | ブラウザで開いて見た目を確認するだけ。製品コードではない |
 
@@ -545,7 +545,8 @@ TIER 2 のトークンを `@theme inline` に登録すると `bg-surface` / `tex
 | `components-reference.md` | 参照実装 9 件。**新規** `Tabs` / `PageBody`（+`Section`）、**変更** `PageHeader` / `Button` / `StatusBadge` / `DataTable` / `Pagination` / `AppShell` / `Sidebar`。props の型も併記 |
 | `reference/*.html` | 目視確認用。ブラウザで開くとライト／ダーク並びで見える |
 | `ARCHITECTURE.md` | 依存の向き、責任の境界、アプリ別の作業、変更を入れたいときの手順 |
-| `adherence.oxlintrc.json` | lint ルール |
+| `adherence.oxlintrc.json` | lint ルール（oxlint / ESLint 共通の純粋な JSON） |
+| `design-system-plugin.mjs` | oxlint 用 JS プラグイン（`no-restricted-syntax` 相当） |
 
 ---
 

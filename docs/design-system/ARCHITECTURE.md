@@ -178,12 +178,18 @@ const FILE_STATUS: Record<FileStatus, StatusBadgeProps["variant"]> = {
 
 ### lint で機械的に守る
 
-`docs/design-system/adherence.oxlintrc.json` のルールを3アプリの
-`.oxlintrc.json` に取り込むと、以下が警告になります。
+`docs/design-system/adherence.oxlintrc.json` を3アプリの lint 設定から参照すると、`src/**/*.{ts,tsx}` の以下がエラーになります。
+取り込み方（oxlint は `extends`、ESLint は同じ JSON を `no-restricted-syntax` に渡す）は、リポジトリ直下の `AGENTS.md`「lint」節を参照してください。
 
-- 生の hex（`#1a73c1` など）→ トークンを使え
-- 生の px → 余白トークンを使え
-- `components/core/**` など内部パスへの直 import → ルートから import しろ
+- 生の hex（`#1a73c1` など）→ 色トークンを使う
+- inline style の生の px → 余白・寸法トークンか Tailwind のユーティリティを使う（Tailwind のレイアウト寸法 `min-w-[640px]` 等は画面固有のレイアウトとして許容）
+- デザインシステムに無い書体 → `var(--font-sans)` / `var(--font-mono)`
+- 文字サイズ・行間・字間・角丸の任意値（`text-[10px]` / `rounded-[3px]`）→ `text-xs` / `rounded-md` 等のトークン
+- 旧トークン名（`bg-card` / `var(--primary)` 等。§5 の表の左列）→ 新名
+- `@engchina/production-ready-ui/dist/**` など内部パスへの直 import → パッケージのルートから import する
+- `loading` 中に `Button` のラベルを差し替える → ラベルは固定する
+
+prop の妥当性（`Button` に存在しない prop を渡す等）は lint ではなく TypeScript の型チェックで検出します。
 
 **新規コードにこの lint を通すのが、ドリフトを止める唯一の現実的な手段です。**
 
