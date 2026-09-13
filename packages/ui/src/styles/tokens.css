@@ -25,6 +25,7 @@
 @import "./tokens/palette.css";
 @import "./tokens/colors.css";
 @import "./tokens/colors-graph.css";
+@import "./tokens/typography.css";
 @import "./tokens/spacing.css";
 @import "./tokens/radius.css";
 @import "./tokens/elevation.css";
@@ -64,4 +65,20 @@
   --color-graph-fg: var(--graph-fg);
   --color-graph-line: var(--graph-line);
   --font-sans: var(--font-sans);
+
+  /* 文字サイズは px（ルート非依存）。14px ルートのままだと rem の text-sm が 12.25px になるため、
+     Tailwind の --text-* を typography.css の px トークンに向ける。余白（rem）は動かさない。 */
+  --text-xs: var(--font-size-xs);
+  --text-xs--line-height: var(--line-height-xs);
+  --text-sm: var(--font-size-sm);
+  --text-sm--line-height: var(--line-height-sm);
+  --text-base: var(--font-size-base);
+  --text-base--line-height: var(--line-height-base);
+  /* 仕様外。既定の 1.125rem（15.75px）だと text-base（16px）より小さく逆転するため、Tailwind 標準の px 値にする。 */
+  --text-lg: 18px;
+  --text-lg--line-height: 28px;
+  --text-xl: var(--font-size-xl);
+  --text-xl--line-height: var(--line-height-xl);
+  --text-2xl: var(--font-size-2xl);
+  --text-2xl--line-height: var(--line-height-2xl);
 }

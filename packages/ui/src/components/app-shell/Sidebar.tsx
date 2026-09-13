@@ -129,7 +129,7 @@ export function Sidebar({
               </span>
               <kbd
                 className={cn(
-                  "sidebar-reveal shrink-0 rounded border border-white/20 px-1.5 py-0.5 text-[10px] font-medium text-sidebar-foreground/70",
+                  "sidebar-reveal shrink-0 rounded border border-white/20 px-1.5 py-0.5 text-xs font-medium text-sidebar-foreground/70",
                   collapsed && "hidden"
                 )}
                 aria-hidden

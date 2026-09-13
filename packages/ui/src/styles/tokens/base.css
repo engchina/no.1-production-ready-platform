@@ -17,6 +17,19 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* 日本語の行組版。禁則処理を効かせ、任意の文字での分断を禁止する。
+   ID / パス / SQL だけは .pr-break-anywhere で明示的に折り返す。 */
+body {
+  line-break: strict;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.pr-break-anywhere {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .sidebar-shell {
   contain: paint;
 }
