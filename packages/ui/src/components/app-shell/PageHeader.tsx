@@ -178,7 +178,7 @@ function OverflowMenu({ actions, label }: { actions: PageHeaderAction[]; label: 
 }
 
 /**
- * 画面共通ヘッダー。スクロールしても上端に貼り付き（sticky）、タイトルと主要操作に常に手が届く。
+ * 画面共通ヘッダー。lg 以上ではスクロールしても上端に貼り付き（sticky）、タイトルと主要操作に常に手が届く。
  * `<header>` は画面幅いっぱい（背景と罫線）、中身は PageBody と同じ計測コンテナに入れる。
  * `wide` は PageBody と必ず同じ値にする（ずらすと 1920px でタイトルと本文の左端がずれる）。
  */
@@ -240,7 +240,8 @@ export function PageHeader({
   return (
     <header
       className={cn(
-        "sticky top-0 z-[var(--z-sticky)] flex flex-col border-b border-border bg-surface",
+        // 貼り付くのは lg 以上だけ。狭い画面では文字の折り返しでヘッダーが高くなり、貼り付くと本文の表示領域を常に削るため。
+        "flex flex-col border-b border-border bg-surface lg:sticky lg:top-0 lg:z-[var(--z-sticky)]",
         tabs ? "gap-4 pt-5" : "py-5",
         className
       )}
