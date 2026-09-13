@@ -86,6 +86,56 @@ Issue の要点と、この変更が必要な理由を記載する。bug fix で
 - docs-only など test 対象外の場合も `検証結果` を省略せず、`git diff --check` 等の実施結果と、コード test を実行しない理由を記載する。
 - PR 作成後に追加修正や検証結果の変化があった場合は、コメントだけで済ませず PR 本文を最終状態へ更新してから review / merge する。
 
+## デザインシステム / UI
+
+- **UI に触る変更（`packages/ui` および各業務 repo の `frontend/`）では、`docs/design-system/` を正本とする。** 作業前に [ARCHITECTURE.md](./docs/design-system/ARCHITECTURE.md) を読む。トークン値・コンポーネント仕様・意図的な見た目の変更点は [README.md](./docs/design-system/README.md) に、実装の参照は [components-reference.md](./docs/design-system/components-reference.md) にある。
+- **依存の向きを逆流させない。** デザインシステムの決定 → `packages/ui` → 各業務 repo（`file:` リンク）の一方向のみ。業務 repo 側でコンポーネントやトークンを新規実装してはならない。必要になった場合は `packages/ui` に入れる Issue を立てる。
+- **業務 repo が持てるのは `nav-config.ts`（ナビ構造）、`i18n.ts`（業務コピー）、データ取得・状態管理・権限、ドメイン enum → コンポーネント prop の対応表、画面固有の業務レイアウトのみ。** 色・型・余白・角丸・影・モーションは `packages/ui` が持つ。
+- 1製品しか使わないもの（`WorkflowProgressStrip`、オントロジーグラフ等）は業務 repo に置いてよい。判断基準は **「他の2製品がこれを欲しがるか」** — 欲しがるなら `packages/ui` に入れる。
+
+### 禁止事項
+
+- 生の hex（`#1a73c1` 等）と生の px を書く。トークンを `var()` で参照する。
+- 業務 repo の `globals.css` に色トークンを定義する。`@engchina/production-ready-ui/styles.css` を import する。
+- `TextField` / `PageHeader` / ボタン等の共有コンポーネントを再実装する。
+- `<table>` を手書きする。`DataTable` を使う。
+- `<div style={{ padding: "1.5rem 2rem" }}>` のような余白コンテナを手書きする。`PageBody` を使う。
+- `ToggleChip` をタブ代わりに使う。タブ＝ビュー切替は `Tabs`、チップ＝データの絞り込みは `ToggleChip`。
+- `loading` 中にボタンのラベルを「実行中…」等に差し替える。ラベルは変えず、先頭アイコンがスピナーに置き換わる。
+- **製品ごとのアクセント色を作る。** 製品は wordmark・ナビ・内容で区別する。
+- 絵文字と手描き SVG。アイコンは Lucide を `Icon` 経由で使う。
+- コンポーネント内部パス（`components/core/**` 等）への直 import。パッケージのルートから import する。
+
+### 画面の構成
+
+すべての画面は次の構成に従う。この順序を外れた画面は review で差し戻す。
+
+```tsx
+<AppShell sidebar={<Sidebar … />}>
+  <PageHeader title="…" actions={…} tabs={<Tabs … />} />
+  <PageBody>
+    <Section title="…">
+      …
+    </Section>
+  </PageBody>
+</AppShell>
+```
+
+- `PageHeader` と `PageBody` に `wide` を渡す場合は**必ず両方に同じ値**を渡す。片方だけだと 1920px で左端が 240px ずれる。
+- 単位の境界: **文字サイズとコントロール高さは px**（ルート非依存）、**余白とレイアウト寸法は rem**（14px ルート）。
+
+### UI 変更の検証
+
+- `packages/ui` の変更は、**ライト / ダークの両テーマ**と、**1280px / 1920px の両幅**で確認する。
+- 色・コントラストに関わる変更では、`docs/design-system/reference/*.html` をブラウザで開いて実測値と突き合わせる。
+- キーボード操作（Tab 順、フォーカスリングの視認性、`Tabs` の ← → / Home / End）を確認する。
+- 状態を表す UI は**色だけに依存しない**こと。`StatusBadge` / `Banner` / `Toast` はアイコンで冗長に符号化する。グレースケールにして判別できるか確認する。
+- `docs/design-system/README.md` §9 の検収基準を PR の `検証結果` に転記する。
+
+### lint
+
+`docs/design-system/adherence.oxlintrc.json` のルール（生の hex、生の px、内部パスへの直 import）を各 repo の `.oxlintrc.json` に取り込む。**新規コードにこの lint を通すことが、デザインシステムからのドリフトを止める唯一の現実的な手段である。**
+
 ## CI / 検証コマンド
 
 PR の CI は `.github/workflows/ci.yml` で実行される。変更範囲に応じて merge 前にローカルでも同じ command を実行し、結果を PR の `検証結果` に記載する。
