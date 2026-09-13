@@ -70,6 +70,9 @@ describe("PageHeader", () => {
     );
     expect(html).toMatch(/aria-label="文書一覧を再読込"[^>]*data-testid="reload-docs"/);
     expect(html).toContain("最終更新 10:00");
+    expect(
+      renderToStaticMarkup(<PageHeader title="文書" actionsTestId="doc-actions" actions={[{ id: "a", kind: "primary", label: "保存" }]} />)
+    ).toMatch(/role="group"[^>]*data-testid="doc-actions"/);
   });
 
   it("従来の ReactNode の actions もそのまま描画する（後方互換）", () => {
