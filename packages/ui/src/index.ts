@@ -72,7 +72,7 @@ export {
 
 // --- app shell / layout ---
 export { AppShell } from "./components/app-shell/AppShell";
-export { Sidebar, SidebarAccountFooter, type SidebarProps } from "./components/app-shell/Sidebar";
+export { Sidebar, SidebarAccountFooter, type SidebarFooterAction, type SidebarProps } from "./components/app-shell/Sidebar";
 export { PageHeader, type PageHeaderAction } from "./components/app-shell/PageHeader";
 export { PageBody, Section } from "./components/app-shell/PageBody";
 export {
