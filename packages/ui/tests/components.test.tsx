@@ -54,7 +54,7 @@ describe("PageHeader", () => {
     const ids = (r: ReturnType<typeof splitCompactActions>) => [r.visible.map((x) => x.id), r.overflow.map((x) => x.id)];
     expect(ids(splitCompactActions([a("del", "danger"), a("new", "primary"), a("reload", "utility"), a("import", "secondary")]))).toEqual([
       ["new"],
-      ["del", "reload", "import"],
+      ["import", "reload", "del"],
     ]);
     expect(ids(splitCompactActions([a("reload", "utility"), a("import", "secondary")]))).toEqual([["import"], ["reload"]]);
     expect(ids(splitCompactActions([a("del", "danger"), a("del2", "danger")]))).toEqual([[], ["del", "del2"]]);

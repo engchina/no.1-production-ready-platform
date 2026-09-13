@@ -44,12 +44,16 @@ export function orderActions(actions: PageHeaderAction[]): PageHeaderAction[] {
     .map(({ action }) => action);
 }
 
-/** 狭い画面（lg 未満）で見せる 1 つ。primary → secondary → utility の優先で選び、danger は常にメニュー側に置く。 */
+/**
+ * 狭い画面（lg 未満）で見せる 1 つ。primary → secondary → utility の優先で選び、danger は常にメニュー側に置く。
+ * メニューは上から重要な順（secondary → utility → danger）。破壊的な操作を末尾に置き、誤タップを避ける。
+ */
 export function splitCompactActions(actions: PageHeaderAction[]) {
-  const ordered = orderActions(actions);
-  if (ordered.length <= 1) return { visible: ordered, overflow: [] as PageHeaderAction[] };
-  const visible = [...ordered].reverse().find((action) => action.kind !== "danger");
-  return { visible: visible ? [visible] : [], overflow: ordered.filter((action) => action !== visible) };
+  // 同じ kind の中は渡した順を保つ（reverse すると同じ kind の順も逆になるため sort で並べる）。
+  const byImportance = [...orderActions(actions)].sort((a, b) => ORDER[b.kind] - ORDER[a.kind]);
+  if (byImportance.length <= 1) return { visible: byImportance, overflow: [] as PageHeaderAction[] };
+  const visible = byImportance.find((action) => action.kind !== "danger");
+  return { visible: visible ? [visible] : [], overflow: byImportance.filter((action) => action !== visible) };
 }
 
 /** メニュー内のキー操作（WAI-ARIA Menu Button）。移動先の index、対象外のキーは null。 */
