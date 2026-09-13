@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { ChevronDown, LogOut, Moon, PanelLeftClose, PanelLeftOpen, Search, Sun, UserRound } from "lucide-react";
+import { ChevronDown, LogOut, type LucideIcon, Moon, PanelLeftClose, PanelLeftOpen, Search, Sun, UserRound } from "lucide-react";
 
 import { cn } from "../../lib/utils";
 import type { NavLinkComponent, NavSection, SidebarLabels } from "../../navigation/types";
@@ -221,34 +221,12 @@ export function Sidebar({
                         <SidebarTooltip label={fullLabel} enabled={collapsed}>
                           <Link
                             to={item.href}
-                            className={cn(
-                              "relative flex h-11 min-h-11 items-center overflow-hidden rounded-md text-sm transition-colors",
-                              collapsed ? "justify-center px-0" : "gap-2.5 px-3 py-2",
-                              active
-                                ? "bg-accent-emphasis text-fg-on-accent forced-colors:bg-[Highlight] forced-colors:text-[HighlightText] forced-colors:forced-color-adjust-none"
-                                : "hover:bg-surface-hover hover:text-fg forced-colors:hover:bg-[Highlight] forced-colors:hover:text-[HighlightText]"
-                            )}
+                            className={navRowClass(collapsed, active)}
                             aria-current={active ? "page" : undefined}
                             aria-label={ariaLabel}
                             title={collapsed ? undefined : fullLabel}
                           >
-                            {/* 左アクセントバー: 現在地を背景色だけに頼らず位置でも示す（color-not-only）。 */}
-                            {active ? (
-                              <span
-                                className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-fg"
-                                aria-hidden
-                              />
-                            ) : null}
-                            <Icon className="shrink-0" size={20} aria-hidden />
-                            <span
-                              className={cn(
-                                "sidebar-reveal min-w-0 truncate whitespace-nowrap leading-5",
-                                collapsed && "w-0"
-                              )}
-                              aria-hidden={collapsed}
-                            >
-                              {displayLabel}
-                            </span>
+                            <NavRowContent icon={Icon} label={displayLabel} collapsed={collapsed} active={active} />
                           </Link>
                         </SidebarTooltip>
                       </li>
@@ -269,34 +247,74 @@ export function Sidebar({
   );
 }
 
+/** ナビ行（リンク・フッターの行アクション共通）。現在地は塗り + 左バーで示す。 */
+function navRowClass(collapsed: boolean, active: boolean) {
+  return cn(
+    "relative flex h-11 min-h-11 w-full items-center overflow-hidden rounded-md text-sm transition-colors",
+    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring",
+    collapsed ? "justify-center px-0" : "gap-2.5 px-3 py-2 text-left",
+    active
+      ? "bg-accent-emphasis text-fg-on-accent forced-colors:bg-[Highlight] forced-colors:text-[HighlightText] forced-colors:forced-color-adjust-none"
+      : "cursor-pointer hover:bg-surface-hover hover:text-fg forced-colors:hover:bg-[Highlight] forced-colors:hover:text-[HighlightText]"
+  );
+}
+
+function NavRowContent({ icon: Icon, label, collapsed, active }: { icon: LucideIcon; label: string; collapsed: boolean; active: boolean }) {
+  return (
+    <>
+      {/* 左アクセントバー: 現在地を背景色だけに頼らず位置でも示す（color-not-only）。 */}
+      {active ? <span className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-fg" aria-hidden /> : null}
+      <Icon className="shrink-0" size={20} aria-hidden />
+      <span className={cn("sidebar-reveal min-w-0 truncate whitespace-nowrap leading-5", collapsed && "w-0")} aria-hidden={collapsed}>
+        {label}
+      </span>
+    </>
+  );
+}
+
+/** フッターの行アクション（パスワード変更など）。ナビ行と同じ見た目で、`active` は現在地（`aria-current="page"`）。 */
+export interface SidebarFooterAction {
+  id: string;
+  /** 翻訳済みラベル。折りたたみ時はツールチップと読み上げ名になる。 */
+  label: string;
+  icon: LucideIcon;
+  onClick: () => void;
+  active?: boolean;
+}
+
 /**
- * サイドバー下部のアカウント領域（ユーザー名・ロール・ログアウト・テーマ切替）。
+ * サイドバー下部のアカウント領域。上から「ユーザー（name があるとき）→ notice → actions → ログアウト / テーマ切替」。
  * Sidebar の `footer` スロットに渡す。ラベルは翻訳済み文字列で上書きする。
+ * - 認証の無いアプリ（Agent 等）は `name` を省き、テーマ切替だけを置ける。
+ * - `notice` はモード表示（ローカル DEBUG など）。ログアウトを出さない場合は `onLogout` を省く。
+ *   折りたたみ時の表示はアプリ側で `collapsed` を見て切り替える。
  */
 export function SidebarAccountFooter({
   name,
   roles,
   collapsed,
-  theme,
+  theme = "light",
   onToggleTheme,
   onLogout,
+  actions = [],
+  notice,
   labels = { logout: "ログアウト", switchToLight: "ライトテーマに切り替え", switchToDark: "ダークテーマに切り替え" },
 }: {
-  name: string;
+  name?: string;
   roles?: string;
   collapsed: boolean;
-  /** 現在適用中のテーマ（system 設定の場合は解決後の値）。 */
-  theme: "light" | "dark";
+  /** 現在適用中のテーマ（system 設定の場合は解決後の値）。`onToggleTheme` と一緒に渡す。 */
+  theme?: "light" | "dark";
   onToggleTheme?: () => void;
   onLogout?: () => void;
+  actions?: SidebarFooterAction[];
+  notice?: ReactNode;
   labels?: { logout: string; switchToLight: string; switchToDark: string };
 }) {
-  const row =
-    "flex h-11 min-h-11 cursor-pointer items-center gap-2.5 rounded-md text-sm transition-colors hover:bg-surface-hover hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring forced-colors:hover:bg-[Highlight] forced-colors:hover:text-[HighlightText]";
   const themeLabel = theme === "dark" ? labels.switchToLight : labels.switchToDark;
   return (
     <div className="grid gap-1">
-      {collapsed ? null : (
+      {name && !collapsed ? (
         <div className="flex min-h-11 items-center gap-2.5 px-3 py-2" title={roles ? `${name}（${roles}）` : name}>
           <UserRound className="shrink-0" size={20} aria-hidden />
           <div className="min-w-0">
@@ -304,35 +322,62 @@ export function SidebarAccountFooter({
             {roles ? <div className="truncate text-xs text-fg-subtle">{roles}</div> : null}
           </div>
         </div>
-      )}
-      <div className={cn("flex gap-1", collapsed && "flex-col")}>
-        {onLogout ? (
-          <SidebarTooltip label={labels.logout} enabled={collapsed}>
-            <button
-              type="button"
-              onClick={onLogout}
-              aria-label={collapsed ? labels.logout : undefined}
-              className={cn(row, "w-full flex-1", collapsed ? "justify-center px-0" : "justify-start px-3")}
-            >
-              <LogOut className="shrink-0" size={20} aria-hidden />
-              {collapsed ? null : <span className="truncate">{labels.logout}</span>}
-            </button>
-          </SidebarTooltip>
-        ) : null}
-        {onToggleTheme ? (
-          <SidebarTooltip label={themeLabel} enabled={collapsed}>
-            <button
-              type="button"
-              onClick={onToggleTheme}
-              aria-label={themeLabel}
-              title={collapsed ? undefined : themeLabel}
-              className={cn(row, "justify-center border border-border px-0", collapsed ? "w-full" : "w-11")}
-            >
-              {theme === "dark" ? <Sun size={20} aria-hidden /> : <Moon size={20} aria-hidden />}
-            </button>
-          </SidebarTooltip>
-        ) : null}
-      </div>
+      ) : null}
+      {notice}
+      {actions.map((action) => (
+        <SidebarTooltip key={action.id} label={action.label} enabled={collapsed}>
+          <button
+            type="button"
+            onClick={action.onClick}
+            aria-current={action.active ? "page" : undefined}
+            aria-label={collapsed ? action.label : undefined}
+            className={navRowClass(collapsed, Boolean(action.active))}
+          >
+            <NavRowContent icon={action.icon} label={action.label} collapsed={collapsed} active={Boolean(action.active)} />
+          </button>
+        </SidebarTooltip>
+      ))}
+      {onLogout || onToggleTheme ? (
+        <div className={cn("flex gap-1", collapsed && "flex-col")}>
+          {onLogout ? (
+            <SidebarTooltip label={labels.logout} enabled={collapsed}>
+              <button
+                type="button"
+                onClick={onLogout}
+                aria-label={collapsed ? labels.logout : undefined}
+                className={cn(navRowClass(collapsed, false), "flex-1")}
+              >
+                <NavRowContent icon={LogOut} label={labels.logout} collapsed={collapsed} active={false} />
+              </button>
+            </SidebarTooltip>
+          ) : null}
+          {onToggleTheme ? (
+            <SidebarTooltip label={themeLabel} enabled={collapsed}>
+              {onLogout && !collapsed ? (
+                <button
+                  type="button"
+                  onClick={onToggleTheme}
+                  aria-label={themeLabel}
+                  title={themeLabel}
+                  className="flex h-11 min-h-11 w-11 cursor-pointer items-center justify-center rounded-md border border-border transition-colors hover:bg-surface-hover hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring forced-colors:hover:bg-[Highlight] forced-colors:hover:text-[HighlightText]"
+                >
+                  {theme === "dark" ? <Sun size={20} aria-hidden /> : <Moon size={20} aria-hidden />}
+                </button>
+              ) : (
+                // ログアウトと並ばない（テーマ切替だけ・折りたたみ時）ときはナビ行と同じ形にし、展開時はラベルも出す
+                <button
+                  type="button"
+                  onClick={onToggleTheme}
+                  aria-label={collapsed ? themeLabel : undefined}
+                  className={navRowClass(collapsed, false)}
+                >
+                  <NavRowContent icon={theme === "dark" ? Sun : Moon} label={themeLabel} collapsed={collapsed} active={false} />
+                </button>
+              )}
+            </SidebarTooltip>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }

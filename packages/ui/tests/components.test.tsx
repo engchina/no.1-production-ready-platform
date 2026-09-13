@@ -1,9 +1,10 @@
-import { RefreshCw, Upload } from "lucide-react";
+import { KeyRound, RefreshCw, Upload } from "lucide-react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { AppShell } from "../src/components/app-shell/AppShell";
 import { PageBody, Section } from "../src/components/app-shell/PageBody";
+import { SidebarAccountFooter } from "../src/components/app-shell/Sidebar";
 import { nextMenuIndex, orderActions, PageHeader, splitCompactActions } from "../src/components/app-shell/PageHeader";
 import { StatusBadge } from "../src/components/data/status-badge";
 import { Button } from "../src/components/ui/button";
@@ -182,5 +183,43 @@ describe("TextField", () => {
     const describedBy = html.match(/aria-describedby="([^"]+)"/)?.[1];
     expect(describedBy).toBeTruthy();
     expect(html).toMatch(new RegExp(`<p id="${describedBy}"[^>]*><a href="https://example.com/docs">ドキュメント</a></p>`));
+  });
+});
+
+describe("SidebarAccountFooter", () => {
+  const password = { id: "password", label: "パスワード変更", icon: KeyRound, onClick: () => {} };
+
+  it("行アクションはナビ行と同じ形で、現在地は aria-current=page", () => {
+    const html = renderToStaticMarkup(
+      <SidebarAccountFooter name="山田" roles="管理者" collapsed={false} actions={[{ ...password, active: true }]} onLogout={() => {}} />
+    );
+    expect(html).toContain("山田");
+    expect(html).toMatch(/<button type="button" aria-current="page" class="[^"]*bg-accent-emphasis[^"]*">/);
+    expect(html).toContain("パスワード変更");
+    expect(html).toContain("ログアウト");
+  });
+
+  it("折りたたみ時は行アクションとログアウトに読み上げ名を付け、ユーザー名は出さない", () => {
+    const html = renderToStaticMarkup(
+      <SidebarAccountFooter name="山田" collapsed actions={[password]} onLogout={() => {}} />
+    );
+    expect(html).not.toContain("山田");
+    expect(html).toContain('aria-label="パスワード変更"');
+    expect(html).toContain('aria-label="ログアウト"');
+  });
+
+  it("notice はログアウトの代わりに置け、name を省くとユーザー領域を出さない", () => {
+    const html = renderToStaticMarkup(
+      <SidebarAccountFooter collapsed={false} notice={<p role="status">ローカル DEBUG</p>} />
+    );
+    expect(html).toContain('<p role="status">ローカル DEBUG</p>');
+    expect(html).not.toContain("ログアウト");
+    expect(html).not.toMatch(/lucide-user-round/);
+  });
+
+  it("テーマ切替だけのときはラベル付きの行にする（アイコンだけの幅広ボタンにしない）", () => {
+    const html = renderToStaticMarkup(<SidebarAccountFooter collapsed={false} theme="light" onToggleTheme={() => {}} />);
+    expect(html).toContain("ダークテーマに切り替え");
+    expect(html).not.toMatch(/w-11/);
   });
 });
