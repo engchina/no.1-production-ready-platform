@@ -1,0 +1,28 @@
+/* 段(elevation)。ライトは影で、ダークは面の明度で浮きを作ります。
+   ダークで同じ影を使うと何も見えないので、影は濃くしたうえで
+   --color-surface-raised / -overlay と必ずセットで使うこと。 */
+:root {
+  --shadow-sm: 0 1px 3px 0 light-dark(rgb(0 0 0 / 0.10), rgb(0 0 0 / 0.45)),
+               0 1px 2px -1px light-dark(rgb(0 0 0 / 0.10), rgb(0 0 0 / 0.40));
+  --shadow-lg: 0 10px 15px -3px light-dark(rgb(0 0 0 / 0.10), rgb(0 0 0 / 0.55)),
+               0 4px 6px -4px light-dark(rgb(0 0 0 / 0.10), rgb(0 0 0 / 0.45));
+  --shadow-xl: 0 20px 25px -5px light-dark(rgb(0 0 0 / 0.10), rgb(0 0 0 / 0.60)),
+               0 8px 10px -6px light-dark(rgb(0 0 0 / 0.10), rgb(0 0 0 / 0.50));
+  --shadow-2xl: 0 25px 50px -12px light-dark(rgb(0 0 0 / 0.25), rgb(0 0 0 / 0.70));
+
+  --shadow-card:    var(--shadow-sm);
+  --shadow-popover: var(--shadow-lg);  /* SelectField list, tooltip */
+  --shadow-toast:   var(--shadow-lg);
+  --shadow-dialog:  var(--shadow-xl);
+  --shadow-palette: var(--shadow-2xl); /* command palette */
+  --scrim: light-dark(rgb(0 0 0 / 0.5), rgb(0 0 0 / 0.7)); /* @kind color */
+
+  /* 重なり順。1 段しかなく SelectField が zIndex:50 直書きだった問題の解。 */
+  --z-dropdown: 100;  /* @kind other */
+  --z-popover:  200;  /* @kind other */
+  --z-sticky:   300;  /* @kind other */
+  --z-scrim:    900;  /* @kind other */
+  --z-dialog:  1000;  /* @kind other */
+  --z-toast:   1100;  /* @kind other */
+  --z-palette: 1200;  /* @kind other */
+}
