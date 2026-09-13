@@ -29,7 +29,7 @@ describe("Tabs", () => {
   it("選択中だけが Tab 順に入り（roving tabIndex）、パネルと aria-controls で結ばれる", () => {
     const html = renderToStaticMarkup(<Tabs items={items} value="failed" ariaLabel="表示" />);
     expect(html).toContain('role="tablist"');
-    expect(html).toMatch(/id="pr-tab-failed"[^>]*aria-selected="true"[^>]*aria-controls="pr-tabpanel-failed"[^>]*tabindex="0"/);
+    expect(html).toMatch(/id="pr-tab-failed"[^>]*aria-selected="true"[^>]*aria-controls="pr-panel-failed"[^>]*tabindex="0"/);
     expect(html).toMatch(/id="pr-tab-all"[^>]*aria-selected="false"[^>]*tabindex="-1"/);
   });
 });

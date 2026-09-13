@@ -94,7 +94,7 @@ export function Tabs({ items, value, onChange, ariaLabel, idPrefix = "pr", class
             aria-selected={selected}
             aria-label={item.ariaLabel}
             aria-describedby={badge == null ? undefined : badgeId}
-            aria-controls={`${idPrefix}-tabpanel-${item.id}`}
+            aria-controls={`${idPrefix}-panel-${item.id}`}
             tabIndex={selected ? 0 : -1}
             disabled={item.disabled}
             onClick={() => onChange?.(item.id)}
@@ -143,7 +143,7 @@ export function TabPanel({
   return (
     <div
       role="tabpanel"
-      id={`${idPrefix}-tabpanel-${id}`}
+      id={`${idPrefix}-panel-${id}`}
       aria-labelledby={`${idPrefix}-tab-${id}`}
       tabIndex={0}
       className={cn("min-w-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring", className)}
