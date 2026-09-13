@@ -22,6 +22,15 @@ describe("tokens CSS", () => {
     expect(read("tokens.css")).toMatch(/--text-xs:\s*var\(--font-size-xs\);/);
   });
 
+  it("フォーム入力のフォーカスリングは外側へはみ出さない（内側 1px のリング）", () => {
+    const base = read("tokens/base.css");
+    const rule = base.match(
+      /:is\(input, textarea, select\):not\(\[type="checkbox"\]\):not\(\[type="radio"\]\):focus-visible\s*\{([^}]*)\}/
+    )?.[1];
+    expect(rule).toMatch(/outline:\s*none;/);
+    expect(rule).toMatch(/box-shadow:\s*inset 0 0 0 1px var\(--color-focus-ring\);/);
+  });
+
   it(".dark に色値の手書き宣言を持たない（テーマは light-dark() で解決する）", () => {
     for (const file of ["tokens.css", "tokens/colors.css", "tokens/base.css"]) {
       expect(read(file)).not.toMatch(/\.dark\s*\{[^}]*#[0-9a-f]{3,8}/i);
