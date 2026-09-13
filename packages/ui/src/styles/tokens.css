@@ -17,7 +17,6 @@
  *   TIER 1   palette.css   原色。コンポーネントから参照禁止
  *   TIER 2   colors.css    意味トークン（--color-*）+ [data-surface] スコープ
  *   a11y.css               forced-colors / prefers-contrast。base の規則も上書きするので後ろ
- *   compat.css             旧名 → 新名の @deprecated エイリアス。3 アプリ移行後に削除
  *
  * テーマ: <html class="dark"> / data-theme="dark" | "light" | "auto"（color-scheme + light-dark()）。
  */
@@ -32,7 +31,6 @@
 @import "./tokens/motion.css";
 @import "./tokens/base.css";
 @import "./tokens/a11y.css";
-@import "./tokens/compat.css";
 
 @theme inline {
   /* TIER 2 — 意味トークン（bg-surface / text-fg-muted / border-border-control …）。
@@ -103,27 +101,4 @@
   --text-xl--line-height: var(--line-height-xl);
   --text-2xl: var(--font-size-2xl);
   --text-2xl--line-height: var(--line-height-2xl);
-}
-
-/* 旧名ユーティリティ（bg-primary / text-muted 等）。3 アプリの移行（PR 5）まで compat.css 経由で残す。 */
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-muted: var(--muted);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-active: var(--sidebar-active);
-  --color-success: var(--success);
-  --color-success-bg: var(--success-bg);
-  --color-warning: var(--warning);
-  --color-warning-bg: var(--warning-bg);
-  --color-danger: var(--danger);
-  --color-danger-bg: var(--danger-bg);
-  --color-info: var(--info);
-  --color-info-bg: var(--info-bg);
-  --color-ring: var(--ring);
-  --color-code: var(--code);
-  --color-code-fg: var(--code-fg);
 }

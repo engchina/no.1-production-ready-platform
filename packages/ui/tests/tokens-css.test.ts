@@ -6,6 +6,13 @@ const read = (path: string) => readFileSync(new URL(`../src/styles/${path}`, imp
 const colors = read("tokens/colors.css");
 
 describe("tokens CSS", () => {
+  it("旧トークン名の互換層（compat.css / 旧名ユーティリティ）を持たない", () => {
+    const entry = read("tokens.css");
+    expect(entry).not.toMatch(/compat\.css/);
+    expect(entry).not.toMatch(/--color-(card|muted|primary|background|foreground):/);
+    expect(() => read("tokens/compat.css")).toThrow();
+  });
+
   it("light-dark() には色だけを渡す（混合率などを渡すと宣言ごと無効になる）", () => {
     expect(colors).not.toMatch(/light-dark\(\s*\d+%/);
   });
