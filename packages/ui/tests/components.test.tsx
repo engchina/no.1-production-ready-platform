@@ -53,6 +53,13 @@ describe("PageHeader", () => {
     expect(renderToStaticMarkup(<PageHeader title="文書" wide />)).not.toContain(measure);
   });
 
+  it("本文の grid item は内容幅で広がらず、アクション群は折り返す（狭い画面で横にはみ出さない）", () => {
+    expect(renderToStaticMarkup(<PageBody>本文</PageBody>)).toContain("[&amp;&gt;*]:min-w-0");
+    expect(renderToStaticMarkup(<PageHeader title="文書" actions={[{ id: "a", kind: "primary", label: "保存" }]} />)).toMatch(
+      /role="group"[^>]*class="[^"]*flex-wrap/
+    );
+  });
+
   it("従来の ReactNode の actions もそのまま描画する（後方互換）", () => {
     const html = renderToStaticMarkup(<PageHeader title="文書" actions={<button type="button">旧</button>} />);
     expect(html).toContain("旧</button>");
