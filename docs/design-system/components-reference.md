@@ -643,6 +643,23 @@ export function DataTable({ columns = [], rows = [], rowKey = "id", dense = fals
 }
 ```
 
+> **packages/ui の追加 props（一覧用、platform #56）。** 上の参照実装に無い、業務一覧の手書き `<table>` を置き換えるための props です。すべて optional で、渡さなければ出力は変わりません。
+>
+> | prop | 役割 |
+> |---|---|
+> | `stickyHeader` | `thead` をスクロール領域の上端に固定する。罫線は th の内側（inset shadow）に持たせ、スクロールしても消えない |
+> | `visibleRows` / `fillVisibleRows` | `number` か `{ base, md }`（md = 48rem 以上）。表頭 + 先頭 N 行の**実測高さ**でスクロール領域の `max-height`（fill では `height`）を決める。2 行セルで行高が変わっても N 行ちょうどが見える |
+> | `scrollAriaLabel` / `scrollTestId` | スクロール領域を `role="region"` + `tabIndex=0` + フォーカスリングにする（WCAG 2.1.1 キーボードでスクロール） |
+> | `selectedRowKey` | master-detail で表示中の行。`aria-current="true"` + `bg-accent-subtle`。全行に `data-selected` |
+> | `isRowSelected` | チェックボックスの複数選択。背景だけ付け、状態はチェックボックスが伝える |
+> | `onRowClick` | マウス操作の補助。行内の button / a / input / label 等のクリックでは発火しない。キーボード用に行内の button も置く |
+> | `rowProps` | 行の `className` / `aria-label` / `data-testid` |
+> | `renderRowDetail` | 行の直後に全幅の補足行（分析結果など）。`visibleRows` の計測では直前の行に含める |
+> | `columns[].rowHeader` | `<th scope="row">` で描画する |
+> | `tableClassName` / `loadingRows` | `table-fixed` や `min-w-*`、スケルトン行数 |
+>
+> 並べ替えヘッダーは折り返さず（`white-space: nowrap`）、当たり判定の高さは `--button-height-sm`（タッチ端末では 44px）です。
+
 ---
 
 ## Sidebar.jsx — 変更

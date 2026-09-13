@@ -245,6 +245,8 @@ import { Ellipsis, RefreshCw, Upload } from "lucide-react";
 - **ソートの当たり判定を `<th>` 全体に**（`.pr-sort-header`）。旧実装は `<button>` が文字高（約15px）しかなく、**24px 最小タップ領域も割っていました**。hover も無く押せると分かりませんでした
 - `wordBreak: "break-word"` を廃止 → 日本語が任意の文字で分断される問題を解消
 - ヘッダーの地を `--color-surface-sunken` に
+- 見出しセルは折り返さない。並べ替えボタンの高さは `--button-height-sm`（タッチ端末 44px）
+- 一覧用の optional props（platform #56）: `stickyHeader`、`visibleRows`（表頭 + 先頭 N 行の実測高さで内部スクロール）、`scrollAriaLabel`（キーボードでスクロールできる region）、`selectedRowKey` / `isRowSelected`、`rowProps`、`renderRowDetail`、列の `rowHeader`。詳細は `components-reference.md`。**アプリで `<table>` を手書きしない**
 
 ### `AppShell`（変更）
 
