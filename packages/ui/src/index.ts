@@ -68,6 +68,8 @@ export {
   type DataTableProps,
   type DataTableColumn,
   type DataTableSort,
+  type DataTableRowProps,
+  type DataTableVisibleRows,
   type SortDirection,
 } from "./components/data/data-table";
 

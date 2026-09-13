@@ -1,5 +1,5 @@
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import type { ReactNode } from "react";
+import { Fragment, useCallback, useLayoutEffect, useRef, useState, type CSSProperties, type MouseEvent, type ReactNode } from "react";
 
 import { cn } from "../../lib/utils";
 
@@ -22,6 +22,18 @@ export interface DataTableColumn<T> {
   /** td/th 共通の追加 class。 */
   className?: string;
   headerClassName?: string;
+  /** 行を識別する列。`<th scope="row">` として描画する（スクリーンリーダーが行見出しとして読む）。 */
+  rowHeader?: boolean;
+}
+
+/** 表示行数。`{ base, md }` は md（48rem）以上で `md` を使う。 */
+export type DataTableVisibleRows = number | { base: number; md?: number };
+
+/** 行（`<tr>`）へ渡せる属性。 */
+export interface DataTableRowProps {
+  className?: string;
+  "aria-label"?: string;
+  "data-testid"?: string;
 }
 
 export interface DataTableProps<T> {
@@ -31,18 +43,48 @@ export interface DataTableProps<T> {
   /** 制御式ソート。並べ替え自体は caller が行う（presentational）。 */
   sort?: DataTableSort | null;
   onSortChange?: (sort: DataTableSort) => void;
+  /**
+   * 行クリック（マウス操作の補助）。行内の button / a / input / label 等を押したときは発火しない。
+   * キーボードでは行を選べないため、行を開く・選ぶ操作は行内の button でも提供する。
+   */
   onRowClick?: (row: T) => void;
+  /** master-detail で詳細に表示中の行。`aria-current="true"` と選択背景を付ける。 */
+  selectedRowKey?: string | number | null;
+  /** 複数選択（チェックボックス行）で選択背景を付ける。状態はチェックボックス側で伝える。 */
+  isRowSelected?: (row: T, index: number) => boolean;
+  /** 行ごとの class / aria-label / data-testid。 */
+  rowProps?: (row: T, index: number) => DataTableRowProps;
+  /** 行の直後に全幅の補足行を描画する（null で描画しない）。 */
+  renderRowDetail?: (row: T, index: number) => ReactNode;
   /** 読込中は行の代わりにスケルトンを描画。 */
   loading?: boolean;
+  /** 読込中のスケルトン行数（既定 3）。 */
+  loadingRows?: number;
   /** 行が空かつ非読込のとき表示（EmptyState 等）。 */
   empty?: ReactNode;
   /** 密表示（py を詰める）。 */
   dense?: boolean;
+  /** 表頭をスクロール領域の上端に固定する。 */
+  stickyHeader?: boolean;
+  /**
+   * 表頭 + 先頭 N 行の実測高さでスクロール領域の max-height を決め、以降は内部スクロールにする。
+   * 2 行セルなどで行高が変わっても N 行ちょうどが見える（固定 rem の計算は行高が変わると行数がずれる）。
+   */
+  visibleRows?: DataTableVisibleRows;
+  /** visibleRows 未満の行数でも N 行分の高さを確保する（最後の行の高さで補う）。 */
+  fillVisibleRows?: boolean;
+  /** 外枠（スクロール領域）の追加 class。 */
   className?: string;
+  /** `<table>` の追加 class（`table-fixed` / `min-w-[52rem]` 等）。 */
+  tableClassName?: string;
   /** テーブルの aria-label（任意）。 */
   ariaLabel?: string;
   /** <table> に付与する data-testid（既存 e2e の getByTestId 互換用）。 */
   testId?: string;
+  /** 指定するとスクロール領域を `role="region"` + Tab 到達可能にし、この名前で読み上げる（WCAG 2.1.1）。 */
+  scrollAriaLabel?: string;
+  /** スクロール領域（外枠）の data-testid。 */
+  scrollTestId?: string;
 }
 
 const ALIGN_CLASS: Record<NonNullable<DataTableColumn<unknown>["align"]>, string> = {
@@ -51,14 +93,79 @@ const ALIGN_CLASS: Record<NonNullable<DataTableColumn<unknown>["align"]>, string
   center: "text-center",
 };
 
+/** 行クリックを発火させない行内の操作要素。 */
+const INTERACTIVE_SELECTOR =
+  'a,button,input,select,textarea,label,summary,[role="button"],[role="checkbox"],[role="link"],[role="menuitem"],[role="switch"],[contenteditable="true"],[data-row-action]';
+
+/** md ブレークポイント（Tailwind v4 の md = 48rem。メディアクエリの rem はルート文字サイズに依存しない）。 */
+const MD_QUERY = "(min-width: 48rem)";
+
 function ariaSortValue(sort: DataTableSort | null | undefined, key: string) {
   if (!sort || sort.key !== key) return "none" as const;
   return sort.direction === "asc" ? ("ascending" as const) : ("descending" as const);
 }
 
+/** クリック位置が行内の操作要素か（行そのものは除く）。 */
+export function isInteractiveRowTarget(target: EventTarget | null, row: Element) {
+  if (!(target instanceof Element)) return false;
+  const interactive = target.closest(INTERACTIVE_SELECTOR);
+  return Boolean(interactive && interactive !== row && row.contains(interactive));
+}
+
+/** 表示行数の設定を現在の幅で解決する。 */
+export function resolveVisibleRows(visibleRows: DataTableVisibleRows | undefined, isMd: boolean) {
+  if (visibleRows == null) return undefined;
+  if (typeof visibleRows === "number") return visibleRows;
+  return isMd && visibleRows.md != null ? visibleRows.md : visibleRows.base;
+}
+
+/**
+ * スクロール領域の高さ（border-box）を実測値から求める。
+ * tableTop / rowBottoms は同じ座標系（getBoundingClientRect）の値。chrome は border + 横スクロールバー。
+ */
+export function measureVisibleRowsHeight({
+  tableTop,
+  headerBottom,
+  rowBottoms,
+  rows,
+  chrome,
+  fill,
+}: {
+  tableTop: number;
+  headerBottom: number;
+  rowBottoms: readonly number[];
+  rows: number;
+  chrome: number;
+  fill: boolean;
+}) {
+  if (rows <= 0) return undefined;
+  if (rowBottoms.length === 0) return undefined;
+  const shown = Math.min(rows, rowBottoms.length);
+  let bottom = rowBottoms[shown - 1];
+  if (fill && shown < rows) {
+    const lastTop = shown >= 2 ? rowBottoms[shown - 2] : headerBottom;
+    const lastHeight = Math.max(bottom - lastTop, 0);
+    bottom += lastHeight * (rows - shown);
+  }
+  return Math.ceil(bottom - tableTop + chrome);
+}
+
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(false);
+  useLayoutEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
+    const media = window.matchMedia(query);
+    setMatches(media.matches);
+    const onChange = () => setMatches(media.matches);
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, [query]);
+  return matches;
+}
+
 /**
  * 共通データテーブル。列定義 + 制御式ソート（aria-sort）+ 空/読込 + 横スクロール内蔵。
- * 生 <table> の手書きを段階置換する。ソート/選択が不要な単純表は columns の render だけで使う。
+ * 一覧に必要な固定表頭・表示行数の固定・行の選択状態も持つ。生 <table> の手書きを置換する。
  */
 export function DataTable<T>({
   columns,
@@ -67,14 +174,72 @@ export function DataTable<T>({
   sort,
   onSortChange,
   onRowClick,
+  selectedRowKey,
+  isRowSelected,
+  rowProps,
+  renderRowDetail,
   loading,
+  loadingRows = 3,
   empty,
   dense,
+  stickyHeader,
+  visibleRows,
+  fillVisibleRows,
   className,
+  tableClassName,
   ariaLabel,
   testId,
+  scrollAriaLabel,
+  scrollTestId,
 }: DataTableProps<T>) {
   const cellPad = dense ? "px-3 py-1.5" : "px-3 py-2";
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const tableRef = useRef<HTMLTableElement>(null);
+  const isMd = useMediaQuery(MD_QUERY);
+  const rowLimit = resolveVisibleRows(visibleRows, isMd);
+  const [measuredHeight, setMeasuredHeight] = useState<number>();
+  const selectable = selectedRowKey !== undefined || Boolean(isRowSelected);
+
+  const measure = useCallback(() => {
+    const scroller = scrollRef.current;
+    const table = tableRef.current;
+    if (!scroller || !table || rowLimit == null) {
+      setMeasuredHeight(undefined);
+      return;
+    }
+    const tableTop = table.getBoundingClientRect().top;
+    const header = table.tHead?.getBoundingClientRect();
+    const body = table.tBodies[0];
+    const rowBottoms: number[] = [];
+    // 補足行（renderRowDetail）は直前のデータ行に含めて数える。
+    for (const row of Array.from(body?.rows ?? [])) {
+      if (row.dataset.rowKind === "detail") {
+        if (rowBottoms.length > 0) rowBottoms[rowBottoms.length - 1] = row.getBoundingClientRect().bottom;
+        continue;
+      }
+      if (row.dataset.rowKind !== "data" && row.dataset.rowKind !== "skeleton") continue;
+      rowBottoms.push(row.getBoundingClientRect().bottom);
+    }
+    const chrome = scroller.offsetHeight - scroller.clientHeight;
+    const next = measureVisibleRowsHeight({
+      tableTop,
+      headerBottom: header?.bottom ?? tableTop,
+      rowBottoms,
+      rows: rowLimit,
+      chrome,
+      fill: Boolean(fillVisibleRows),
+    });
+    setMeasuredHeight((current) => (current === next ? current : next));
+  }, [rowLimit, fillVisibleRows]);
+
+  useLayoutEffect(() => {
+    measure();
+    if (rowLimit == null || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => measure());
+    if (tableRef.current) observer.observe(tableRef.current);
+    if (scrollRef.current) observer.observe(scrollRef.current);
+    return () => observer.disconnect();
+  }, [measure, rowLimit, rows, loading]);
 
   function toggleSort(key: string) {
     if (!onSortChange) return;
@@ -83,12 +248,44 @@ export function DataTable<T>({
     onSortChange({ key, direction: nextDirection });
   }
 
+  function handleRowClick(event: MouseEvent<HTMLTableRowElement>, row: T) {
+    if (!onRowClick || isInteractiveRowTarget(event.target, event.currentTarget)) return;
+    onRowClick(row);
+  }
+
   const showEmpty = !loading && rows.length === 0;
+  const scrollable = rowLimit != null || Boolean(scrollAriaLabel);
+  const scrollStyle: CSSProperties | undefined =
+    measuredHeight == null
+      ? undefined
+      : fillVisibleRows
+        ? { height: measuredHeight, maxHeight: measuredHeight }
+        : { maxHeight: measuredHeight };
+  // sticky の表頭はスクロールすると tbody の上罫線が離れるため、罫線を th の内側に持たせる。
+  const headerCellSticky = stickyHeader ? "shadow-[inset_0_-1px_0_var(--color-border)]" : undefined;
 
   return (
-    <div className={cn("overflow-x-auto rounded-md border border-border bg-surface", className)}>
-      <table className="min-w-full divide-y divide-border text-left text-xs" aria-label={ariaLabel} data-testid={testId}>
-        <thead className="bg-surface-sunken text-fg-muted">
+    <div
+      ref={scrollRef}
+      role={scrollAriaLabel ? "region" : undefined}
+      aria-label={scrollAriaLabel}
+      tabIndex={scrollAriaLabel ? 0 : undefined}
+      data-testid={scrollTestId}
+      style={scrollStyle}
+      className={cn(
+        "rounded-md border border-border bg-surface",
+        scrollable ? "overflow-auto" : "overflow-x-auto",
+        scrollAriaLabel && "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring",
+        className
+      )}
+    >
+      <table
+        ref={tableRef}
+        className={cn("min-w-full text-left text-xs", !stickyHeader && "divide-y divide-border", tableClassName)}
+        aria-label={ariaLabel}
+        data-testid={testId}
+      >
+        <thead className={cn("bg-surface-sunken text-fg-muted", stickyHeader && "sticky top-0 z-10")}>
           <tr>
             {columns.map((column) => {
               const alignClass = column.align ? ALIGN_CLASS[column.align] : "text-left";
@@ -100,15 +297,15 @@ export function DataTable<T>({
                     key={column.key}
                     scope="col"
                     aria-sort={ariaSortValue(sort, column.key)}
-                    className={cn("p-0", alignClass, "font-semibold", column.headerClassName)}
+                    className={cn("p-0", alignClass, "font-semibold", headerCellSticky, column.headerClassName)}
                   >
-                    {/* 当たり判定は <th> 全体（文字高だけのボタンは 24px の最小タップ領域を割る）。 */}
+                    {/* 当たり判定は <th> 全体（文字高だけのボタンは 24px の最小タップ領域を割る）。タッチ端末では 44px。 */}
                     <button
                       type="button"
                       onClick={() => toggleSort(column.key)}
                       className={cn(
                         cellPad,
-                        "flex w-full cursor-pointer items-center gap-1 font-semibold transition-colors hover:bg-surface-hover hover:text-fg focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus-ring forced-colors:hover:bg-[Highlight] forced-colors:hover:text-[HighlightText]",
+                        "flex min-h-[var(--button-height-sm)] w-full cursor-pointer items-center gap-1 whitespace-nowrap font-semibold transition-colors hover:bg-surface-hover hover:text-fg focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus-ring forced-colors:hover:bg-[Highlight] forced-colors:hover:text-[HighlightText]",
                         column.align === "right" ? "justify-end" : column.align === "center" ? "justify-center" : "justify-start",
                         active ? "text-fg" : "text-fg-muted"
                       )}
@@ -123,7 +320,7 @@ export function DataTable<T>({
                 <th
                   key={column.key}
                   scope="col"
-                  className={cn(cellPad, alignClass, "font-semibold", column.headerClassName)}
+                  className={cn(cellPad, alignClass, "font-semibold", "whitespace-nowrap", headerCellSticky, column.headerClassName)}
                 >
                   {column.header}
                 </th>
@@ -133,34 +330,64 @@ export function DataTable<T>({
         </thead>
         <tbody className="divide-y divide-border/70 text-fg">
           {loading
-            ? Array.from({ length: 3 }).map((_, rowIndex) => (
-                <tr key={`skeleton-${rowIndex}`} aria-hidden="true">
+            ? Array.from({ length: loadingRows }).map((_, rowIndex) => (
+                <tr key={`skeleton-${rowIndex}`} aria-hidden="true" data-row-kind="skeleton">
                   {columns.map((column) => (
                     <td key={column.key} className={cellPad}>
-                      <span className="block h-4 w-full animate-pulse rounded bg-surface-hover" />
+                      <span className="block h-4 w-full animate-pulse rounded bg-surface-hover motion-reduce:animate-none" />
                     </td>
                   ))}
                 </tr>
               ))
-            : rows.map((row, index) => (
-                <tr
-                  key={getRowKey(row, index)}
-                  onClick={onRowClick ? () => onRowClick(row) : undefined}
-                  className={onRowClick ? "cursor-pointer hover:bg-surface-hover" : undefined}
-                >
-                  {columns.map((column) => {
-                    const alignClass = column.align ? ALIGN_CLASS[column.align] : "text-left";
-                    const content = column.render
-                      ? column.render(row, index)
-                      : String((row as Record<string, unknown>)[column.key] ?? "");
-                    return (
-                      <td key={column.key} className={cn(cellPad, alignClass, column.className)}>
-                        {content}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
+            : rows.map((row, index) => {
+                const rowKey = getRowKey(row, index);
+                const current = selectedRowKey != null && rowKey === selectedRowKey;
+                const selected = current || Boolean(isRowSelected?.(row, index));
+                const extra = rowProps?.(row, index);
+                const detail = renderRowDetail?.(row, index);
+                return (
+                  <Fragment key={rowKey}>
+                    <tr
+                      data-row-kind="data"
+                      data-selected={selectable ? (selected ? "true" : "false") : undefined}
+                      aria-current={current ? "true" : undefined}
+                      aria-label={extra?.["aria-label"]}
+                      data-testid={extra?.["data-testid"]}
+                      onClick={onRowClick ? (event) => handleRowClick(event, row) : undefined}
+                      className={cn(
+                        (onRowClick || selectable) && "transition-colors",
+                        onRowClick && "cursor-pointer",
+                        selected ? "bg-accent-subtle" : onRowClick && "hover:bg-surface-hover",
+                        extra?.className
+                      )}
+                    >
+                      {columns.map((column) => {
+                        const alignClass = column.align ? ALIGN_CLASS[column.align] : "text-left";
+                        const content = column.render
+                          ? column.render(row, index)
+                          : String((row as Record<string, unknown>)[column.key] ?? "");
+                        const cellClass = cn(cellPad, alignClass, column.rowHeader && "font-normal", column.className);
+                        return column.rowHeader ? (
+                          <th key={column.key} scope="row" className={cellClass}>
+                            {content}
+                          </th>
+                        ) : (
+                          <td key={column.key} className={cellClass}>
+                            {content}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                    {detail != null && detail !== false ? (
+                      <tr data-row-kind="detail" className={selected ? "bg-accent-subtle" : undefined}>
+                        <td colSpan={Math.max(columns.length, 1)} className={cellPad}>
+                          {detail}
+                        </td>
+                      </tr>
+                    ) : null}
+                  </Fragment>
+                );
+              })}
           {showEmpty ? (
             <tr>
               <td colSpan={Math.max(columns.length, 1)} className="px-3 py-6 text-center text-fg-muted">
