@@ -134,7 +134,39 @@ Issue の要点と、この変更が必要な理由を記載する。bug fix で
 
 ### lint
 
-`docs/design-system/adherence.oxlintrc.json` のルール（生の hex、生の px、内部パスへの直 import）を各 repo の `.oxlintrc.json` に取り込む。**新規コードにこの lint を通すことが、デザインシステムからのドリフトを止める唯一の現実的な手段である。**
+`docs/design-system/adherence.oxlintrc.json` が、デザインシステム遵守ルールの正本である。**新規コードにこの lint を通すことが、デザインシステムからのドリフトを止める唯一の現実的な手段である。**
+
+- 対象は各 repo の `frontend/src/**/*.{ts,tsx}`。検出するのは次の 7 つ: 生の hex、inline style の生の px、デザインシステムに無い書体、文字サイズ・行間・字間・角丸の任意値（`text-[10px]` 等）、旧トークン名（ユーティリティ / CSS 変数）、`@engchina/production-ready-ui` の内部パス import、`loading` 中の `Button` ラベルの差し替え。
+- prop の妥当性は TypeScript の型チェックに任せ、lint では検査しない（コンポーネントごとの許可 prop 一覧は廃止した）。
+- oxlint にはネイティブの `no-restricted-syntax` が無い。そのため、同じ `{selector, message}` 形式を受け取る JS プラグイン `docs/design-system/design-system-plugin.mjs` を platform に置き、adherence 設定から相対パスで読み込む。
+- **各 repo はルールもプラグインもコピーせず、platform の設定を参照する。** アプリ CI は `file:` リンクのために platform を sibling に checkout しているので、同じ相対パスで解決できる。コピーすると、ルール変更が各 repo に届かない。
+
+```jsonc
+// oxlint（frontend/.oxlintrc.json）
+{
+  "extends": ["../../no.1-production-ready-platform/docs/design-system/adherence.oxlintrc.json"]
+}
+```
+
+```js
+// ESLint（frontend/eslint.config.mjs）— 同じセレクタを ESLint 標準の no-restricted-syntax に渡す
+import adherence from "../../no.1-production-ready-platform/docs/design-system/adherence.oxlintrc.json" with { type: "json" };
+const { rules } = adherence.overrides[0];
+export default [
+  // …
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-syntax": rules["design-system/restricted-syntax"],
+      "no-restricted-imports": rules["no-restricted-imports"],
+    },
+  },
+];
+```
+
+- adherence 設定は oxlint と ESLint の両方が読むため、コメントや独自キーを書かない純粋な JSON に保つ（`x-omelette` のような未知のキーがあると、oxlint 1.82.0 は読み込みに失敗する）。
+- ルールを変えるときは、NL2SQL（oxlint）と RAG / Agent（ESLint）の `src` で違反件数を確認し、PR の `検証結果` に書く。違反が残る場合は、各 repo の追従 Issue を作ってから merge する。
+- アプリ固有のルールは各 repo の設定に追加してよい。ただし、同じルール名（`design-system/restricted-syntax` / `no-restricted-syntax`）を上書きすると adherence のセレクタが消えるので、別のルール名にする。
 
 ## CI / 検証コマンド
 
