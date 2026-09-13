@@ -34,6 +34,20 @@ describe("Tabs", () => {
   });
 });
 
+describe("Tabs のバッジ", () => {
+  it("文字列バッジと testId を出し、aria-describedby でタブと結ぶ。タブ単位の aria-label を付けられる", () => {
+    const html = renderToStaticMarkup(
+      <Tabs
+        idPrefix="md"
+        value="draft"
+        items={[{ id: "draft", label: "下書き", ariaLabel: "下書きの Markdown", badge: "v4", badgeTestId: "draft-meta" }]}
+      />
+    );
+    expect(html).toMatch(/aria-label="下書きの Markdown"[^>]*aria-describedby="md-tab-draft-badge"/);
+    expect(html).toMatch(/id="md-tab-draft-badge" data-testid="draft-meta"[^>]*>v4<\/span>/);
+  });
+});
+
 describe("PageHeader", () => {
   it("アクションを danger → utility → secondary → primary に並べ、同じ kind は渡した順を保つ", () => {
     const ordered = orderActions([

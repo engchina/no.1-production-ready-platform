@@ -7,7 +7,13 @@ export interface TabItem {
   id: string;
   label: string;
   icon?: LucideIcon;
+  /** 件数（等幅数字）。 */
   count?: number;
+  /** 件数以外の短いバッジ（版数・状態など）。count と同じ見た目で出す。 */
+  badge?: string;
+  badgeTestId?: string;
+  /** 表示ラベルより詳しい読み上げ名が必要な場合だけ指定する。 */
+  ariaLabel?: string;
   disabled?: boolean;
 }
 
@@ -74,6 +80,8 @@ export function Tabs({ items, value, onChange, ariaLabel, idPrefix = "pr", class
       {items.map((item) => {
         const selected = item.id === value;
         const Icon = item.icon;
+        const badge = item.count ?? item.badge;
+        const badgeId = `${idPrefix}-tab-${item.id}-badge`;
         return (
           <button
             key={item.id}
@@ -84,6 +92,8 @@ export function Tabs({ items, value, onChange, ariaLabel, idPrefix = "pr", class
             role="tab"
             id={`${idPrefix}-tab-${item.id}`}
             aria-selected={selected}
+            aria-label={item.ariaLabel}
+            aria-describedby={badge == null ? undefined : badgeId}
             aria-controls={`${idPrefix}-tabpanel-${item.id}`}
             tabIndex={selected ? 0 : -1}
             disabled={item.disabled}
@@ -99,9 +109,13 @@ export function Tabs({ items, value, onChange, ariaLabel, idPrefix = "pr", class
           >
             {Icon ? <Icon size={16} className="shrink-0" aria-hidden /> : null}
             <span>{item.label}</span>
-            {item.count == null ? null : (
-              <span className="tnum inline-flex min-w-6 items-center justify-center rounded-full bg-surface-hover px-1.5 text-xs font-normal text-fg-muted group-aria-selected:bg-accent-muted group-aria-selected:text-accent-fg-strong">
-                {item.count}
+            {badge == null ? null : (
+              <span
+                id={badgeId}
+                data-testid={item.badgeTestId}
+                className="tnum inline-flex min-w-6 items-center justify-center rounded-full bg-surface-hover px-1.5 text-xs font-normal text-fg-muted group-aria-selected:bg-accent-muted group-aria-selected:text-accent-fg-strong"
+              >
+                {badge}
               </span>
             )}
           </button>
