@@ -119,3 +119,42 @@ describe("表示行数の計算", () => {
     expect(measureVisibleRowsHeight({ tableTop: 0, headerBottom: 33, rowBottoms: [], rows: 5, chrome: 0, fill: true })).toBeUndefined();
   });
 });
+
+describe("行クリックの対象判定", () => {
+  // vitest は DOM を持たないため、closest / contains だけを持つ最小の Element で判定ロジックを確かめる。
+  class FakeElement {
+    constructor(
+      readonly tag: string,
+      readonly parent: FakeElement | null = null
+    ) {}
+    closest(selector: string): FakeElement | null {
+      const tags = selector.split(",").filter((part) => /^[a-z]+$/.test(part));
+      for (let node: FakeElement | null = this; node; node = node.parent) if (tags.includes(node.tag)) return node;
+      return null;
+    }
+    contains(other: FakeElement) {
+      for (let node: FakeElement | null = other; node; node = node.parent) if (node === this) return true;
+      return false;
+    }
+  }
+
+  it("行の地は行クリック、行内の button と portal（行の DOM の外）は行クリックにしない", async () => {
+    const original = (globalThis as { Element?: unknown }).Element;
+    (globalThis as { Element?: unknown }).Element = FakeElement;
+    try {
+      const { isInteractiveRowTarget } = await import("../src/components/data/data-table");
+      const row = new FakeElement("tr");
+      const cell = new FakeElement("td", row);
+      const button = new FakeElement("button", cell);
+      const label = new FakeElement("span", button);
+      const portalItem = new FakeElement("div", new FakeElement("body"));
+      const asRow = row as unknown as Element;
+      expect(isInteractiveRowTarget(cell as unknown as EventTarget, asRow)).toBe(false);
+      expect(isInteractiveRowTarget(label as unknown as EventTarget, asRow)).toBe(true);
+      expect(isInteractiveRowTarget(portalItem as unknown as EventTarget, asRow)).toBe(true);
+      expect(isInteractiveRowTarget(null, asRow)).toBe(false);
+    } finally {
+      (globalThis as { Element?: unknown }).Element = original;
+    }
+  });
+});
