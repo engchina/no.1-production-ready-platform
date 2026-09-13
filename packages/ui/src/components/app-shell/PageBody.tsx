@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "../../lib/utils";
 
@@ -17,18 +17,12 @@ export function measureClass(wide: boolean) {
  * 手書きの `<div style={{ padding: "1.5rem 2rem" }}>` を置き換える。
  * 表を画面幅いっぱいに出す画面だけ `wide`（PageHeader にも同じ値を渡す）。
  */
-export function PageBody({
-  wide = false,
-  className,
-  children,
-}: {
-  wide?: boolean;
-  className?: string;
-  children?: ReactNode;
-}) {
+export function PageBody({ wide = false, className, children, ...props }: ComponentProps<"div"> & { wide?: boolean }) {
   // grid item は既定で min-width: auto になり、横スクロールする表などが main の外へはみ出すため min-w-0 を付ける。
   return (
-    <div className={cn(measureClass(wide), "grid content-start gap-6 py-6 [&>*]:min-w-0", className)}>{children}</div>
+    <div {...props} className={cn(measureClass(wide), "grid content-start gap-6 py-6 [&>*]:min-w-0", className)}>
+      {children}
+    </div>
   );
 }
 
@@ -41,15 +35,14 @@ export function Section({
   actions,
   className,
   children,
-}: {
+  ...props
+}: Omit<ComponentProps<"section">, "title"> & {
   title?: string;
   description?: string;
   actions?: ReactNode;
-  className?: string;
-  children?: ReactNode;
 }) {
   return (
-    <section className={cn("grid min-w-0 gap-3", className)}>
+    <section {...props} className={cn("grid min-w-0 gap-3", className)}>
       {title || actions ? (
         <div className="flex min-w-0 items-start justify-between gap-4">
           <div className="min-w-0">

@@ -62,7 +62,7 @@ export interface ButtonProps
   trailingIcon?: LucideIcon;
   /** アイコンだけのボタン。`aria-label` を必ず付ける。 */
   iconOnly?: boolean;
-  /** 44px のタップ領域が必要な場面だけ true。 */
+  /** マウス環境でも 44px の高さにする場合だけ true（タッチ端末では --button-height-* が 44px になる）。 */
   touchTarget?: boolean;
   /** true で先頭アイコンがスピナーに置き換わる（ラベル・幅は変わらない）。`aria-busy` と `disabled` が付く。 */
   loading?: boolean;

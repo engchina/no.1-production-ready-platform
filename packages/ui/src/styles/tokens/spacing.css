@@ -51,3 +51,14 @@
   /* 本文の最大計測幅。--main が無制限に伸びると 10.5px の表は読めません。 */
   --content-max-width: 1440px;
 }
+
+/* タッチ端末（coarse pointer）ではボタン高さを 44px にする（WCAG 2.2 SC 2.5.5 / Apple HIG 44pt）。
+   画面幅ではなく入力方式で判定する（マウスで狭いウィンドウを使う場合は密度を保つ）。
+   変数で切り替えるため、呼び出し側の h-* / min-h-* 上書きはそのまま効く。 */
+@media (pointer: coarse) {
+  :root {
+    --button-height-sm: var(--control-height-touch);
+    --button-height-md: var(--control-height-touch);
+    --button-height-lg: var(--control-height-touch);
+  }
+}

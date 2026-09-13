@@ -22,6 +22,12 @@ describe("tokens CSS", () => {
     expect(read("tokens.css")).toMatch(/--text-xs:\s*var\(--font-size-xs\);/);
   });
 
+  it("タッチ端末ではボタン高さを 44px にする", () => {
+    expect(read("tokens/spacing.css")).toMatch(
+      /@media \(pointer: coarse\) \{\s*:root \{\s*--button-height-sm: var\(--control-height-touch\);\s*--button-height-md: var\(--control-height-touch\);\s*--button-height-lg: var\(--control-height-touch\);/
+    );
+  });
+
   it("フォーム入力のフォーカスリングは外側へはみ出さない（内側 1px のリング）", () => {
     const base = read("tokens/base.css");
     const rule = base.match(
