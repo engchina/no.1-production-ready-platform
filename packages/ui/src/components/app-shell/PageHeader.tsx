@@ -11,11 +11,14 @@ export interface PageHeaderAction {
   kind: "primary" | "secondary" | "utility" | "danger";
   /** 翻訳済みラベル。省略するとアイコンだけのボタンになる（`ariaLabel` 必須）。 */
   label?: string;
+  /** 画面の文脈を含む読み上げ名。ラベルがあっても指定すれば優先する（アイコンだけの場合は必須）。 */
   ariaLabel?: string;
   icon?: LucideIcon;
   onClick?: () => void;
   loading?: boolean;
   disabled?: boolean;
+  /** ボタンの data-testid。 */
+  testId?: string;
 }
 
 const ORDER: Record<PageHeaderAction["kind"], number> = { danger: 0, utility: 1, secondary: 2, primary: 3 };
@@ -40,6 +43,7 @@ export function orderActions(actions: PageHeaderAction[]): PageHeaderAction[] {
 export function PageHeader({
   title,
   subtitle,
+  meta,
   status,
   breadcrumbs,
   actions,
@@ -50,6 +54,8 @@ export function PageHeader({
 }: {
   title: string;
   subtitle?: string;
+  /** 副題の下の補足（最終更新・件数など）。 */
+  meta?: ReactNode;
   /** タイトル横の状態表示（StatusBadge 等）。 */
   status?: ReactNode;
   /** タイトル上のパンくず（`<Breadcrumbs>`）。 */
@@ -73,7 +79,8 @@ export function PageHeader({
           variant={VARIANT[action.kind]}
           icon={action.icon}
           iconOnly={!action.label}
-          aria-label={action.label ? undefined : action.ariaLabel}
+          aria-label={action.ariaLabel}
+          data-testid={action.testId}
           loading={action.loading}
           disabled={action.disabled}
           onClick={action.onClick}
@@ -99,6 +106,7 @@ export function PageHeader({
             {status}
           </div>
           {subtitle ? <p className="mt-1 text-sm text-fg-muted">{subtitle}</p> : null}
+          {meta ? <div className="mt-1 text-xs text-fg-muted">{meta}</div> : null}
         </div>
         {(Array.isArray(actionNodes) ? actionNodes.length > 0 : actionNodes) ? (
           <div role="group" aria-label={actionsLabel} className="flex min-w-0 flex-wrap items-center gap-2">

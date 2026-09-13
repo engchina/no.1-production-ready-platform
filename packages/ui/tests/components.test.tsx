@@ -60,6 +60,18 @@ describe("PageHeader", () => {
     );
   });
 
+  it("アクションの testId と ariaLabel、補足の meta を出力する", () => {
+    const html = renderToStaticMarkup(
+      <PageHeader
+        title="文書"
+        meta={<span>最終更新 10:00</span>}
+        actions={[{ id: "reload", kind: "secondary", label: "再読込", ariaLabel: "文書一覧を再読込", testId: "reload-docs" }]}
+      />
+    );
+    expect(html).toMatch(/aria-label="文書一覧を再読込"[^>]*data-testid="reload-docs"/);
+    expect(html).toContain("最終更新 10:00");
+  });
+
   it("従来の ReactNode の actions もそのまま描画する（後方互換）", () => {
     const html = renderToStaticMarkup(<PageHeader title="文書" actions={<button type="button">旧</button>} />);
     expect(html).toContain("旧</button>");
