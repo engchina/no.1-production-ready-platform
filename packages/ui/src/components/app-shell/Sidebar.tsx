@@ -81,7 +81,7 @@ export function Sidebar({
       >
         <div
           className={cn(
-            "sidebar-reveal min-w-0 px-2 text-fg",
+            "sidebar-reveal min-w-0 px-1 text-fg",
             collapsed ? "w-0 px-0" : "flex-1"
           )}
           aria-hidden={collapsed}
