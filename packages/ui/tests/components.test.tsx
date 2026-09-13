@@ -8,6 +8,7 @@ import { orderActions, PageHeader } from "../src/components/app-shell/PageHeader
 import { StatusBadge } from "../src/components/data/status-badge";
 import { Button } from "../src/components/ui/button";
 import { nextTabId, Tabs } from "../src/components/ui/tabs";
+import { TextField } from "../src/components/ui/text-field";
 
 describe("Tabs", () => {
   const items = [
@@ -96,5 +97,14 @@ describe("AppShell", () => {
     const html = renderToStaticMarkup(<AppShell sidebar={<nav />}>本文</AppShell>);
     expect(html).toMatch(/<a class="pr-skip-link" href="#pr-main">/);
     expect(html).toMatch(/<main id="pr-main" tabindex="-1"/);
+  });
+});
+
+describe("TextField", () => {
+  it("required は aria-required とバッジだけで伝え、ネイティブの required 検証を付けない", () => {
+    const html = renderToStaticMarkup(<TextField id="name" label="名前" required requiredLabel="必須" value="" readOnly />);
+    expect(html).toContain('aria-required="true"');
+    expect(html).not.toMatch(/<input[^>]*\srequired=""/);
+    expect(html).toContain("必須");
   });
 });

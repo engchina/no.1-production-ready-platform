@@ -1,4 +1,4 @@
-import { type InputHTMLAttributes, useId } from "react";
+import { type InputHTMLAttributes, type Ref, useId } from "react";
 
 import { cn } from "../../lib/utils";
 
@@ -17,6 +17,7 @@ const fieldControlClass = cn(
 
 /**
  * ラベル・補足・エラー付きの 1 行入力。API は SelectField と揃える。
+ * 必須はネイティブの required 検証にしない（未入力でも保存を許す画面があるため。SelectField と同じ）。
  * 値の扱いはネイティブ input と同じ（`value` / `onChange`）。文字列だけ欲しい場合は `onValueChange`。
  */
 export function TextField({
@@ -31,6 +32,7 @@ export function TextField({
   onValueChange,
   onChange,
   type = "text",
+  ref,
   ...props
 }: {
   id: string;
@@ -40,12 +42,14 @@ export function TextField({
   helper?: string;
   /** 翻訳済みのエラー（任意）。指定時は aria-invalid と枠線の色が変わる。 */
   error?: string;
+  /** 必須であることを aria-required とバッジで伝える。ネイティブの required 検証は行わない（検証はアプリ側）。 */
   required?: boolean;
   /** 必須バッジの文言（任意。例:「必須」）。 */
   requiredLabel?: string;
   className?: string;
   inputClassName?: string;
   onValueChange?: (value: string) => void;
+  ref?: Ref<HTMLInputElement>;
 } & Omit<InputHTMLAttributes<HTMLInputElement>, "id" | "required">) {
   const reactId = useId();
   const hintId = `${id}-${reactId}-hint`;
@@ -63,10 +67,10 @@ export function TextField({
         ) : null}
       </label>
       <input
+        ref={ref}
         id={id}
         type={type}
-        required={required}
-        aria-required={required}
+        aria-required={required || undefined}
         aria-invalid={Boolean(error)}
         aria-describedby={describedBy}
         onChange={(event) => {
