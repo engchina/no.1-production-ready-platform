@@ -3,6 +3,7 @@ import { type InputHTMLAttributes, type ReactNode, type Ref, useId } from "react
 import { cn } from "../../lib/utils";
 
 import { FieldError } from "./field-error";
+import { RequiredBadge } from "./required-badge";
 
 /** 入力欄の見た目（枠線は secondary ボタンと同じ --color-border-control）。 */
 const fieldControlClass = cn(
@@ -42,9 +43,9 @@ export function TextField({
   helper?: ReactNode;
   /** 翻訳済みのエラー（任意）。指定時は aria-invalid と枠線の色が変わる。 */
   error?: string;
-  /** 必須であることを aria-required とバッジで伝える。ネイティブの required 検証は行わない（検証はアプリ側）。 */
+  /** 必須であることを aria-required と中立色の RequiredBadge で伝える。ネイティブの required 検証は行わない（検証はアプリ側）。 */
   required?: boolean;
-  /** 必須バッジの文言（任意。例:「必須」）。 */
+  /** 必須バッジの文言（例:「必須」）。required のときは必ず渡す（無いと見た目で必須が分からない）。 */
   requiredLabel?: string;
   className?: string;
   inputClassName?: string;
@@ -61,9 +62,7 @@ export function TextField({
       <label htmlFor={id} className="flex items-center gap-2 text-sm font-medium text-fg">
         {label}
         {required && requiredLabel ? (
-          <span aria-hidden="true" className="rounded-full bg-warning-subtle px-2 py-0.5 text-xs font-semibold text-warning-fg">
-            {requiredLabel}
-          </span>
+          <RequiredBadge label={requiredLabel} aria-hidden />
         ) : null}
       </label>
       <input

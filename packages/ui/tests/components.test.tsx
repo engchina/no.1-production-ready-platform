@@ -8,6 +8,8 @@ import { SidebarAccountFooter } from "../src/components/app-shell/Sidebar";
 import { nextMenuIndex, orderActions, PageHeader, splitCompactActions } from "../src/components/app-shell/PageHeader";
 import { StatusBadge } from "../src/components/data/status-badge";
 import { Button } from "../src/components/ui/button";
+import { RequiredBadge } from "../src/components/ui/required-badge";
+import { SelectField } from "../src/components/ui/select-field";
 import { nextTabId, Tabs } from "../src/components/ui/tabs";
 import { TextField } from "../src/components/ui/text-field";
 
@@ -176,6 +178,14 @@ describe("TextField", () => {
     expect(html).toContain("必須");
   });
 
+  it("必須バッジは状態色を使わず中立色で出し、入力側の aria-required と二重に読み上げない", () => {
+    const html = renderToStaticMarkup(<TextField id="name" label="名前" required requiredLabel="必須" value="" readOnly />);
+    const badge = html.match(/<span[^>]*>必須<\/span>/)?.[0] ?? "";
+    expect(badge).toContain('aria-hidden="true"');
+    expect(badge).toContain("text-fg-muted");
+    expect(badge).not.toMatch(/warning|danger/);
+  });
+
   it("helper にリンクを含められ、入力欄の aria-describedby と結ばれる", () => {
     const html = renderToStaticMarkup(
       <TextField id="endpoint" label="エンドポイント" value="" readOnly helper={<a href="https://example.com/docs">ドキュメント</a>} />
@@ -183,6 +193,22 @@ describe("TextField", () => {
     const describedBy = html.match(/aria-describedby="([^"]+)"/)?.[1];
     expect(describedBy).toBeTruthy();
     expect(html).toMatch(new RegExp(`<p id="${describedBy}"[^>]*><a href="https://example.com/docs">ドキュメント</a></p>`));
+  });
+});
+
+describe("RequiredBadge", () => {
+  it("既定では読み上げ対象に含め（legend などで単体で使う）、aria-hidden を渡すと外す", () => {
+    expect(renderToStaticMarkup(<RequiredBadge label="必須" />)).not.toContain("aria-hidden");
+    expect(renderToStaticMarkup(<RequiredBadge label="必須" aria-hidden />)).toContain('aria-hidden="true"');
+  });
+
+  it("SelectField も TextField と同じ中立色の必須バッジを出す", () => {
+    const html = renderToStaticMarkup(
+      <SelectField id="region" label="リージョン" value="a" options={[{ value: "a", label: "A" }]} onValueChange={() => {}} required requiredLabel="必須" />
+    );
+    const badge = html.match(/<span[^>]*>必須<\/span>/)?.[0] ?? "";
+    expect(badge).toContain("text-fg-muted");
+    expect(badge).not.toMatch(/warning|danger/);
   });
 });
 
