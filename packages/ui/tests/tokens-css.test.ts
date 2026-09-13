@@ -43,6 +43,17 @@ describe("tokens CSS", () => {
     expect(sidebar).not.toMatch(/\bw-60\b/);
   });
 
+  it("通知はモーダルの下に重なる（toast < scrim < dialog < palette）", () => {
+    const elevation = read("tokens/elevation.css");
+    const z = (name: string) => Number(elevation.match(new RegExp(`--z-${name}:\\s*(\\d+);`))?.[1]);
+    expect(z("sticky")).toBeLessThan(z("toast"));
+    expect(z("toast")).toBeLessThan(z("scrim"));
+    expect(z("scrim")).toBeLessThan(z("dialog"));
+    expect(z("dialog")).toBeLessThan(z("palette"));
+    const toast = readFileSync(new URL("../src/components/ui/toast.tsx", import.meta.url), "utf8");
+    expect(toast).toContain("z-[var(--z-toast)]");
+  });
+
   it("タッチ端末ではボタン高さを 44px にする", () => {
     expect(read("tokens/spacing.css")).toMatch(
       /@media \(pointer: coarse\) \{\s*:root \{\s*--button-height-sm: var\(--control-height-touch\);\s*--button-height-md: var\(--control-height-touch\);\s*--button-height-lg: var\(--control-height-touch\);/

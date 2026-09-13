@@ -387,11 +387,19 @@ import { Ellipsis, RefreshCw, Upload } from "lucide-react";
 --z-dropdown: 100    SelectField のリスト、コンボボックス
 --z-popover:  200    ツールチップ、日付ピッカー
 --z-sticky:   300    PageHeader、スキップリンク
+--z-toast:    800    ToastRegion（モーダルの下）
 --z-scrim:    900    モーダルの暗幕
 --z-dialog:  1000    ConfirmDialog
---z-toast:   1100    ToastRegion
 --z-palette: 1200    コマンドパレット
 ```
+
+**通知（Toast）はモーダルの下に置きます。** モーダル（`aria-modal`）が開いている間はモーダルの外を操作できないため、
+通知を上に重ねても閉じるボタンや action は押せず、狭い画面では確認ダイアログのボタンを覆うだけになります
+（NL2SQL #372 で 375px 幅の確認ダイアログのボタンが成功通知に塞がれた）。Material Design の elevation でも
+dialog（24dp）は snackbar（6dp）より上です。モーダルが開いている間に出た通知は暗幕の下に表示されます（自動で消えない通知はモーダルを閉じた後も残ります）。
+
+- モーダル内の操作の結果は、モーダルの中（`FormStatus` / `FieldError`）に出す。Toast に頼らない
+- Toast はモーダルを閉じた後の結果通知（「削除しました」等）に使う
 
 ### レイアウトと日本語組版
 
@@ -416,7 +424,7 @@ body { line-break: strict; word-break: normal; overflow-wrap: normal; }
 
 ## 7. 意図的な見た目の変更（回帰ではありません）
 
-QA に事前共有してください。**14点あります。**
+QA に事前共有してください。**15点あります。**
 
 | # | 変更 | 旧 → 新 | 理由 |
 |---|---|---|---|
@@ -434,6 +442,7 @@ QA に事前共有してください。**14点あります。**
 | 12 | **PageHeader が sticky になる** | スクロールで消える → 上端に固定 | 長い表で主要操作に手が届く |
 | 13 | 表ヘッダのソートがセル全体クリック可能に | 文字高のみ（約15px）→ セル全体 + hover | 24px 最小タップ領域 |
 | 14 | **入力欄の「必須」バッジが中立色になる** | 琥珀色（`--color-warning-subtle` / `-fg`）→ 地なし + `--color-fg-muted` + `--color-border-strong` の輪郭 | 必須は状態ではなく情報。操作前から注意表示が並ぶのを止める |
+| 15 | **通知がモーダルの下に表示される** | `--z-toast` 1100（モーダルの上）→ **800（暗幕の下）**。通知の action / 閉じるは共有 `Button`（ghost） | モーダル外は操作できないため、上に重ねると確認ダイアログのボタンを塞ぐだけになる（§6 z-index） |
 
 ### API の非互換
 
