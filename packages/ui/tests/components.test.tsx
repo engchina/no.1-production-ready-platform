@@ -129,4 +129,13 @@ describe("TextField", () => {
     expect(html).not.toMatch(/<input[^>]*\srequired=""/);
     expect(html).toContain("必須");
   });
+
+  it("helper にリンクを含められ、入力欄の aria-describedby と結ばれる", () => {
+    const html = renderToStaticMarkup(
+      <TextField id="endpoint" label="エンドポイント" value="" readOnly helper={<a href="https://example.com/docs">ドキュメント</a>} />
+    );
+    const describedBy = html.match(/aria-describedby="([^"]+)"/)?.[1];
+    expect(describedBy).toBeTruthy();
+    expect(html).toMatch(new RegExp(`<p id="${describedBy}"[^>]*><a href="https://example.com/docs">ドキュメント</a></p>`));
+  });
 });

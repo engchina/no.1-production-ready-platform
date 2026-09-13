@@ -1,4 +1,4 @@
-import { type InputHTMLAttributes, type Ref, useId } from "react";
+import { type InputHTMLAttributes, type ReactNode, type Ref, useId } from "react";
 
 import { cn } from "../../lib/utils";
 
@@ -38,8 +38,8 @@ export function TextField({
   id: string;
   /** 翻訳済みラベル。 */
   label: string;
-  /** 翻訳済みの補足（任意）。 */
-  helper?: string;
+  /** 翻訳済みの補足（任意）。ドキュメントへのリンクなどを含めてよい。 */
+  helper?: ReactNode;
   /** 翻訳済みのエラー（任意）。指定時は aria-invalid と枠線の色が変わる。 */
   error?: string;
   /** 必須であることを aria-required とバッジで伝える。ネイティブの required 検証は行わない（検証はアプリ側）。 */
