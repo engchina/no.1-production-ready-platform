@@ -9,6 +9,7 @@ export { cn } from "./lib/utils";
 export { Button, buttonVariants, type ButtonProps } from "./components/ui/button";
 export { Tabs, TabPanel, type TabItem, type TabsProps } from "./components/ui/tabs";
 export { TextField } from "./components/ui/text-field";
+export { RequiredBadge } from "./components/ui/required-badge";
 export { Spinner, type SpinnerProps } from "./components/ui/spinner";
 export {
   Card,

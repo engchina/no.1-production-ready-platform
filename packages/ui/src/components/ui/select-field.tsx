@@ -11,6 +11,7 @@ import {
 import { cn } from "../../lib/utils";
 
 import { FieldError } from "./field-error";
+import { RequiredBadge } from "./required-badge";
 
 export interface SelectFieldOption<T extends string = string> {
   value: T;
@@ -166,12 +167,7 @@ export function SelectField<T extends string>({
       <label id={labelId} htmlFor={id} className="flex items-center gap-2 text-sm font-medium text-fg">
         {label}
         {required && requiredLabel ? (
-          <span
-            aria-hidden="true"
-            className="rounded-full bg-warning-subtle px-2 py-0.5 text-xs font-semibold text-warning-fg"
-          >
-            {requiredLabel}
-          </span>
+          <RequiredBadge label={requiredLabel} aria-hidden />
         ) : null}
       </label>
       <div className="relative">

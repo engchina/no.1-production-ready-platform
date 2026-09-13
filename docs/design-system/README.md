@@ -217,6 +217,29 @@ import { Ellipsis, RefreshCw, Upload } from "lucide-react";
 - **アイコンを必須化**（`icon` 既定 `true`）。success / danger の輝度がほぼ同じで色覚型によって見分けられないため、**形で冗長に符号化**します。強制カラーモードでも意味が残ります
 - `pending` バリアントは **非推奨**（旧実装で `warning` と**完全に同値**でした）。互換のため `VARIANTS.pending = VARIANTS.warning` を残していますが、呼び出し側は `warning` に置換してください
 
+### `TextField` / `SelectField` の必須表示（変更）— ★ 必須は「情報」であり「状態」ではない
+
+`required` + `requiredLabel` で出す必須表示を、**中立色のテキストタグ**に統一しました。単体の `RequiredBadge` も export します。
+
+```jsx
+<TextField id="user" label="ユーザー名" required requiredLabel="必須" />
+// TextField で表せない入力（ファイル選択・fieldset の legend・複合入力）
+<legend>対象の業務ビュー <RequiredBadge label="必須" /></legend>
+```
+
+| 決めたこと | 理由 |
+|---|---|
+| **状態色（warning / danger）を使わない。** 文字 `--color-fg-muted`、輪郭 `--color-border-strong`（装飾）、地は塗らない | 状態色は**利用者の対応が要る状態**の信号です。必須は操作前から決まっている項目の属性なので、状態色で出すと、フォームを開いた瞬間に注意表示が並んでしまいます。そうなると、本物の警告やエラーが埋もれます。未入力で送信したときの `FieldError`（danger）だけが状態色を使います |
+| **記号 `*` ではなくテキスト（翻訳済みの「必須」）** | `*` は意味を伝える凡例文（「* は必須入力項目です」）が要ります。しかし利用者は凡例を読みません（NN/g）。GOV.UK はアスタリスクを使わず、デジタル庁デザインシステムもテキストの「※必須」を使います。テキストなら色にも記号の学習にも頼りません（WCAG 1.4.1 / 3.3.2） |
+| 文字コントラスト 4.5:1 以上 | 実測: light は surface 上 4.83:1、sunken 上 4.55:1。dark は surface 上 8.72:1、overlay 上 7.06:1。淡い灰色の必須表示は弱視の利用者が見落とします（NN/g） |
+| 形は pill（`--radius-pill`）、`ring-inset` の輪郭で行の高さを変えない | バッジの角丸トークンに合わせます。アイコンは付けません。`StatusBadge`（状態 = アイコン必須）と区別するためです |
+| 読み上げ: `TextField` / `SelectField` は `aria-required` で伝え、タグは `aria-hidden` | 「必須、必須」の二重読み上げを防ぎます。`RequiredBadge` を単体で使う場合、既定では読み上げます |
+| 条件付きの必須も同じタグで、文言で区別する（例:「OCI 運用時必須」） | info 色のバッジで別扱いすると、必須表示が 2 種類になります |
+
+- **`required` のときは `requiredLabel` を必ず渡してください。** 渡さないと見た目で必須が分からず、WCAG 3.3.2 を満たしません（`packages/ui` は日本語を持たないため既定文言がありません）
+- 必須表示を**アプリで再実装しない**でください（赤い `*`・warning バッジ・info バッジが3アプリに混在していました）。`TextField` で表せない入力には `RequiredBadge` を置きます
+- ネイティブの `required` 検証は付けません。未入力の検出と `FieldError` の表示はアプリ側で行います（従来どおり）
+
 ### `DataTable`（変更）
 
 - **ソートの当たり判定を `<th>` 全体に**（`.pr-sort-header`）。旧実装は `<button>` が文字高（約15px）しかなく、**24px 最小タップ領域も割っていました**。hover も無く押せると分かりませんでした
@@ -393,7 +416,7 @@ body { line-break: strict; word-break: normal; overflow-wrap: normal; }
 
 ## 7. 意図的な見た目の変更（回帰ではありません）
 
-QA に事前共有してください。**13点あります。**
+QA に事前共有してください。**14点あります。**
 
 | # | 変更 | 旧 → 新 | 理由 |
 |---|---|---|---|
@@ -410,6 +433,7 @@ QA に事前共有してください。**13点あります。**
 | 11 | **ヘッダーのアクション順が反転** | primary 左端 → **primary 右端** | 最も破壊的な操作が最も押しやすい位置だった |
 | 12 | **PageHeader が sticky になる** | スクロールで消える → 上端に固定 | 長い表で主要操作に手が届く |
 | 13 | 表ヘッダのソートがセル全体クリック可能に | 文字高のみ（約15px）→ セル全体 + hover | 24px 最小タップ領域 |
+| 14 | **入力欄の「必須」バッジが中立色になる** | 琥珀色（`--color-warning-subtle` / `-fg`）→ 地なし + `--color-fg-muted` + `--color-border-strong` の輪郭 | 必須は状態ではなく情報。操作前から注意表示が並ぶのを止める |
 
 ### API の非互換
 
@@ -421,6 +445,7 @@ QA に事前共有してください。**13点あります。**
 | `.pr-icon-button` | **削除。** `<Button variant="ghost" iconOnly>` へ |
 | `--font-size-lg` | 削除（未使用の孤児トークンだった） |
 | `AppShell` | スキップリンクと `<main id="pr-main">` を出力 |
+| `RequiredBadge` | **新規 export。** `TextField` / `SelectField` の必須表示と同じタグ。アプリ独自の必須表示（`*` など）はこれに置き換える |
 
 ---
 
@@ -497,6 +522,7 @@ TIER 2 のトークンを `@theme inline` に登録すると `bg-surface` / `tex
 - [ ] Tab キーで最初に「本文へスキップ」に到達する
 - [ ] Windows ハイコントラストモードでボタン・入力・アクティブ nav が消えない
 - [ ] `StatusBadge` をグレースケールにしても状態が判別できる
+- [ ] 必須表示が状態色（warning / danger）を使わず、テキストで示されている（アプリ独自の `*` や色付きバッジが0件）
 - [ ] タブが ← → / Home / End で操作できる
 
 ---
