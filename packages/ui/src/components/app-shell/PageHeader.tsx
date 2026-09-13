@@ -101,7 +101,7 @@ export function PageHeader({
           {subtitle ? <p className="mt-1 text-sm text-fg-muted">{subtitle}</p> : null}
         </div>
         {(Array.isArray(actionNodes) ? actionNodes.length > 0 : actionNodes) ? (
-          <div role="group" aria-label={actionsLabel} className="flex shrink-0 items-center gap-2">
+          <div role="group" aria-label={actionsLabel} className="flex min-w-0 flex-wrap items-center gap-2">
             {actionNodes}
           </div>
         ) : null}

@@ -3,12 +3,13 @@ import type { ReactNode } from "react";
 import { cn } from "../../lib/utils";
 
 /**
- * 本文の計測コンテナ（最大幅 --content-max-width = 1440px で中央寄せ、左右ガター 2rem）。
+ * 本文の計測コンテナ（最大幅 --content-max-width = 1440px で中央寄せ、左右ガター 1rem / 1.5rem / 2rem）。
  * PageHeader の中身と PageBody で共有し、ワイドモニタでもタイトルと本文の左端を揃える。
  * `wide` は PageHeader と PageBody で必ず同じ値にする。
  */
 export function measureClass(wide: boolean) {
-  return cn("w-full min-w-0 px-8", wide ? "max-w-none" : "mx-auto max-w-[var(--content-max-width)]");
+  // 狭い画面ほどガターを詰める。lg（1024px）以上は 2rem で、ワイドモニタでの左端の揃えは変わらない。
+  return cn("w-full min-w-0 px-4 sm:px-6 lg:px-8", wide ? "max-w-none" : "mx-auto max-w-[var(--content-max-width)]");
 }
 
 /**
@@ -25,7 +26,10 @@ export function PageBody({
   className?: string;
   children?: ReactNode;
 }) {
-  return <div className={cn(measureClass(wide), "grid content-start gap-6 py-6", className)}>{children}</div>;
+  // grid item は既定で min-width: auto になり、横スクロールする表などが main の外へはみ出すため min-w-0 を付ける。
+  return (
+    <div className={cn(measureClass(wide), "grid content-start gap-6 py-6 [&>*]:min-w-0", className)}>{children}</div>
+  );
 }
 
 /**
@@ -52,7 +56,7 @@ export function Section({
             {title ? <h2 className="text-base font-semibold text-fg">{title}</h2> : null}
             {description ? <p className="mt-1 text-sm text-fg-muted">{description}</p> : null}
           </div>
-          {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
+          {actions ? <div className="flex min-w-0 flex-wrap items-center gap-2">{actions}</div> : null}
         </div>
       ) : null}
       {children}
