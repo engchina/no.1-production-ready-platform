@@ -25,7 +25,8 @@ export function Spinner({ size = 16, className, ...props }: SpinnerProps) {
       stroke="currentColor"
       strokeWidth={2}
       aria-hidden="true"
-      className={cn("animate-spin motion-reduce:animate-none", className)}
+      // flex item の既定 flex-shrink: 1 で長いラベルに押されて縮まないよう shrink-0。
+      className={cn("shrink-0 animate-spin motion-reduce:animate-none", className)}
       {...props}
     >
       {/* シルエットを一定に保つトラック(全周) */}
