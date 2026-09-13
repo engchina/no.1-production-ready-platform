@@ -105,9 +105,13 @@ function ariaSortValue(sort: DataTableSort | null | undefined, key: string) {
   return sort.direction === "asc" ? ("ascending" as const) : ("descending" as const);
 }
 
-/** クリック位置が行内の操作要素か（行そのものは除く）。 */
+/**
+ * 行クリックとして扱わないクリックか。行内の操作要素（行そのものは除く）と、
+ * portal で行の外に描画された子（行メニューの項目等。React のイベントは portal からも行へ伝わる）を除く。
+ */
 export function isInteractiveRowTarget(target: EventTarget | null, row: Element) {
   if (!(target instanceof Element)) return false;
+  if (!row.contains(target)) return true;
   const interactive = target.closest(INTERACTIVE_SELECTOR);
   return Boolean(interactive && interactive !== row && row.contains(interactive));
 }
