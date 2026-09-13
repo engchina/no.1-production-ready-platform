@@ -168,7 +168,7 @@ export function SelectField<T extends string>({
         {required && requiredLabel ? (
           <span
             aria-hidden="true"
-            className="rounded-full bg-warning-bg px-2 py-0.5 text-[11px] font-semibold text-warning"
+            className="rounded-full bg-warning-bg px-2 py-0.5 text-xs font-semibold text-warning"
           >
             {requiredLabel}
           </span>

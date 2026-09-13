@@ -14,6 +14,14 @@ describe("tokens CSS", () => {
     expect(colors).toMatch(/:root, \.light, \.dark, \[data-theme\], \[data-surface\] \{\s*--font-sans/);
   });
 
+  it("文字は px、ルートは 14px のまま（余白の rem を動かさない）", () => {
+    expect(read("tokens/base.css")).toMatch(/html\s*\{\s*font-size:\s*14px;/);
+    expect(read("tokens/typography.css")).toMatch(/--font-size-sm:\s*14px;/);
+    expect(read("tokens/typography.css")).toMatch(/--font-size-xs:\s*12px;/);
+    expect(read("tokens.css")).toMatch(/--text-sm:\s*var\(--font-size-sm\);/);
+    expect(read("tokens.css")).toMatch(/--text-xs:\s*var\(--font-size-xs\);/);
+  });
+
   it(".dark に色値の手書き宣言を持たない（テーマは light-dark() で解決する）", () => {
     for (const file of ["tokens.css", "tokens/colors.css", "tokens/base.css"]) {
       expect(read(file)).not.toMatch(/\.dark\s*\{[^}]*#[0-9a-f]{3,8}/i);
