@@ -68,7 +68,7 @@ export function Sidebar({
       data-surface="inverted"
       className={cn(
         "sidebar-shell flex h-screen shrink-0 flex-col overflow-hidden bg-surface text-fg-muted transition-[width] duration-200 ease-out motion-reduce:transition-none",
-        collapsed ? "w-16" : "w-60"
+        collapsed ? "w-[var(--sidebar-width-collapsed)]" : "w-[var(--sidebar-width)]"
       )}
       aria-label={labels.aria}
       data-state={sidebarState}
@@ -87,7 +87,7 @@ export function Sidebar({
           aria-hidden={collapsed}
           title={title.full}
         >
-          {/* 仕様の 16px は幅 240px 前提。実幅 15rem（210px）では折りたたみボタンに重なるため 14px。 */}
+          {/* 見出しは 14px。16px にすると長いブランド名が折りたたみボタンに重なる。 */}
           <span className="block truncate whitespace-nowrap text-sm font-bold leading-5">
             {title.line1}
           </span>
