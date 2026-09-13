@@ -86,9 +86,9 @@ export function DataTable<T>({
   const showEmpty = !loading && rows.length === 0;
 
   return (
-    <div className={cn("overflow-x-auto rounded-md border border-border bg-card", className)}>
+    <div className={cn("overflow-x-auto rounded-md border border-border bg-surface", className)}>
       <table className="min-w-full divide-y divide-border text-left text-xs" aria-label={ariaLabel} data-testid={testId}>
-        <thead className="bg-background text-muted">
+        <thead className="bg-surface-sunken text-fg-muted">
           <tr>
             {columns.map((column) => {
               const alignClass = column.align ? ALIGN_CLASS[column.align] : "text-left";
@@ -105,10 +105,10 @@ export function DataTable<T>({
                     <button
                       type="button"
                       onClick={() => toggleSort(column.key)}
-                      className="inline-flex cursor-pointer items-center gap-1 text-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                      className="inline-flex cursor-pointer items-center gap-1 text-fg-muted hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
                     >
                       <span>{column.header}</span>
-                      <Icon size={13} aria-hidden="true" className={active ? "text-foreground" : "text-muted"} />
+                      <Icon size={13} aria-hidden="true" className={active ? "text-fg" : "text-fg-muted"} />
                     </button>
                   </th>
                 );
@@ -125,13 +125,13 @@ export function DataTable<T>({
             })}
           </tr>
         </thead>
-        <tbody className="divide-y divide-border/70 text-foreground">
+        <tbody className="divide-y divide-border/70 text-fg">
           {loading
             ? Array.from({ length: 3 }).map((_, rowIndex) => (
                 <tr key={`skeleton-${rowIndex}`} aria-hidden="true">
                   {columns.map((column) => (
                     <td key={column.key} className={cellPad}>
-                      <span className="block h-4 w-full animate-pulse rounded bg-muted/40" />
+                      <span className="block h-4 w-full animate-pulse rounded bg-surface-hover" />
                     </td>
                   ))}
                 </tr>
@@ -140,7 +140,7 @@ export function DataTable<T>({
                 <tr
                   key={getRowKey(row, index)}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
-                  className={onRowClick ? "cursor-pointer hover:bg-background" : undefined}
+                  className={onRowClick ? "cursor-pointer hover:bg-surface-hover" : undefined}
                 >
                   {columns.map((column) => {
                     const alignClass = column.align ? ALIGN_CLASS[column.align] : "text-left";
@@ -157,7 +157,7 @@ export function DataTable<T>({
               ))}
           {showEmpty ? (
             <tr>
-              <td colSpan={Math.max(columns.length, 1)} className="px-3 py-6 text-center text-muted">
+              <td colSpan={Math.max(columns.length, 1)} className="px-3 py-6 text-center text-fg-muted">
                 {empty}
               </td>
             </tr>

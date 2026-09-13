@@ -15,18 +15,18 @@ export const toneIcon: Record<FeedbackTone, LucideIcon> = {
 
 /** 文字（アイコン・本文）色。 */
 export const toneText: Record<FeedbackTone, string> = {
-  success: "text-success",
-  info: "text-info",
-  warning: "text-warning",
-  danger: "text-danger",
+  success: "text-success-fg",
+  info: "text-info-fg",
+  warning: "text-warning-fg",
+  danger: "text-danger-fg",
 };
 
 /** バナー等の面（枠 + 背景 + 文字）。 */
 export const toneSurface: Record<FeedbackTone, string> = {
-  success: "border-success/30 bg-success-bg/60 text-success",
-  info: "border-info/30 bg-info-bg/60 text-info",
-  warning: "border-warning/30 bg-warning-bg/60 text-warning",
-  danger: "border-danger/30 bg-danger-bg/60 text-danger",
+  success: "border-success-border bg-success-subtle text-success-fg",
+  info: "border-info-border bg-info-subtle text-info-fg",
+  warning: "border-warning-border bg-warning-subtle text-warning-fg",
+  danger: "border-danger-border bg-danger-subtle text-danger-fg",
 };
 
 /** danger は即時読み上げ（alert）、その他は polite（status）。 */

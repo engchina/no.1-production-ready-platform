@@ -28,7 +28,7 @@ export function Breadcrumbs({
   if (items.length === 0) return null;
 
   return (
-    <nav aria-label={ariaLabel} className={cn("flex items-center text-xs text-muted", className)}>
+    <nav aria-label={ariaLabel} className={cn("flex items-center text-xs text-fg-muted", className)}>
       <ol className="flex flex-wrap items-center gap-1">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
@@ -36,12 +36,12 @@ export function Breadcrumbs({
             <Fragment key={`${item.label}-${index}`}>
               <li className="flex items-center">
                 {item.href && !isLast ? (
-                  <Link to={item.href} className="rounded hover:text-foreground hover:underline">
+                  <Link to={item.href} className="rounded hover:text-fg hover:underline">
                     {item.label}
                   </Link>
                 ) : (
                   <span
-                    className={cn(isLast && "font-medium text-foreground")}
+                    className={cn(isLast && "font-medium text-fg")}
                     aria-current={isLast ? "page" : undefined}
                   >
                     {item.label}
@@ -49,7 +49,7 @@ export function Breadcrumbs({
                 )}
               </li>
               {!isLast ? (
-                <li aria-hidden className="flex items-center text-muted/60">
+                <li aria-hidden className="flex items-center text-fg-subtle">
                   <ChevronRight size={13} />
                 </li>
               ) : null}

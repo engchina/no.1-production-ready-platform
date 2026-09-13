@@ -86,7 +86,7 @@ export function Pagination({
   return (
     <nav
       className={cn(
-        "flex flex-wrap items-center justify-between gap-2 text-xs text-muted",
+        "flex flex-wrap items-center justify-between gap-2 text-xs text-fg-muted",
         className
       )}
       aria-label={ariaLabel ?? pageIndicator ?? summary}
@@ -105,7 +105,7 @@ export function Pagination({
           <span>{prevLabel}</span>
         </Button>
         {pageIndicator ? (
-          <span className="tnum inline-flex min-h-8 items-center rounded-md border border-border px-3 text-foreground">
+          <span className="tnum inline-flex min-h-8 items-center rounded-md border border-border px-3 text-fg">
             {pageIndicator}
           </span>
         ) : null}

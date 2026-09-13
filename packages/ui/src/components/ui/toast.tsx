@@ -38,7 +38,7 @@ export function Toaster({
       aria-label={regionLabel}
       aria-live="polite"
       aria-relevant="additions"
-      className="pointer-events-none fixed z-[1000] flex max-h-[calc(100dvh-2rem)] w-[min(92vw,22rem)] flex-col gap-2 overflow-y-auto"
+      className="pointer-events-none fixed z-[var(--z-toast)] flex max-h-[calc(100dvh-2rem)] w-[min(92vw,22rem)] flex-col gap-2 overflow-y-auto"
       style={{
         bottom: "max(1rem, env(safe-area-inset-bottom))",
         ...(placement === "bottom-left"
@@ -61,15 +61,15 @@ function ToastCard({ item, dismissLabel }: { item: ToastItem; dismissLabel: stri
   return (
     <div
       role={toneRole(item.tone)}
-      className="animate-toast-in pointer-events-auto flex items-start gap-2.5 rounded-lg border border-border bg-card px-3.5 py-3 shadow-lg"
+      className="animate-toast-in pointer-events-auto flex items-start gap-2.5 rounded-lg border border-border bg-surface-raised px-3.5 py-3 shadow-[var(--shadow-toast)]"
     >
       <Icon size={16} className={cn("mt-0.5 shrink-0", toneText[item.tone])} aria-hidden />
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium leading-relaxed text-foreground">
+        <p className="text-sm font-medium leading-relaxed text-fg">
           <MessageText text={item.message} />
         </p>
         {item.description ? (
-          <p className="mt-0.5 text-xs leading-relaxed text-muted">
+          <p className="mt-0.5 text-xs leading-relaxed text-fg-muted">
             <MessageText text={item.description} />
           </p>
         ) : null}
@@ -80,7 +80,7 @@ function ToastCard({ item, dismissLabel }: { item: ToastItem; dismissLabel: stri
               item.action?.onClick();
               dismiss(item.id);
             }}
-            className="mt-1.5 cursor-pointer text-xs font-medium text-primary hover:underline"
+            className="mt-1.5 cursor-pointer text-xs font-medium text-accent-fg hover:underline"
           >
             {item.action.label}
           </button>
@@ -90,7 +90,7 @@ function ToastCard({ item, dismissLabel }: { item: ToastItem; dismissLabel: stri
         type="button"
         onClick={() => dismiss(item.id)}
         aria-label={dismissLabel}
-        className="-mr-2 -mt-2 inline-flex h-[44px] w-[44px] min-h-[44px] min-w-[44px] shrink-0 cursor-pointer items-center justify-center rounded-md text-muted transition-colors hover:bg-background hover:text-foreground"
+        className="-mr-2 -mt-2 inline-flex h-[44px] w-[44px] min-h-[44px] min-w-[44px] shrink-0 cursor-pointer items-center justify-center rounded-md text-fg-muted transition-colors hover:bg-surface-hover hover:text-fg"
       >
         <X size={14} aria-hidden />
       </button>

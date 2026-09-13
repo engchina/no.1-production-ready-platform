@@ -35,10 +35,10 @@ export function ErrorState({
   return (
     <div
       role="alert"
-      className="flex flex-col items-center gap-3 rounded-lg border border-danger/30 bg-danger-bg/40 p-8 text-center"
+      className="flex flex-col items-center gap-3 rounded-lg border border-danger-border bg-danger-subtle p-8 text-center"
     >
-      <AlertCircle size={24} className="text-danger" aria-hidden />
-      <p className="text-sm leading-relaxed text-foreground">
+      <AlertCircle size={24} className="text-danger-fg" aria-hidden />
+      <p className="text-sm leading-relaxed text-fg">
         <MessageText text={message} />
       </p>
       {onRetry ? (
@@ -63,12 +63,12 @@ export function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center gap-1 py-10 text-center">
-      <Inbox size={22} className="text-muted" aria-hidden />
-      <p className="mt-1 text-sm leading-relaxed text-foreground">
+      <Inbox size={22} className="text-fg-muted" aria-hidden />
+      <p className="mt-1 text-sm leading-relaxed text-fg">
         <MessageText text={title} />
       </p>
       {hint ? (
-        <p className="max-w-md text-xs leading-relaxed text-muted">
+        <p className="max-w-md text-xs leading-relaxed text-fg-muted">
           <MessageText text={hint} />
         </p>
       ) : null}
