@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { AppShell } from "../src/components/app-shell/AppShell";
-import { PageBody } from "../src/components/app-shell/PageBody";
+import { PageBody, Section } from "../src/components/app-shell/PageBody";
 import { orderActions, PageHeader } from "../src/components/app-shell/PageHeader";
 import { StatusBadge } from "../src/components/data/status-badge";
 import { Button } from "../src/components/ui/button";
@@ -58,6 +58,15 @@ describe("PageHeader", () => {
       { id: "more", kind: "utility", ariaLabel: "その他" },
     ]);
     expect(ordered.map((action) => action.id)).toEqual(["delete", "more", "reload", "export", "save"]);
+  });
+
+  it("PageBody / Section は data-* / aria-* などの属性を DOM に渡す", () => {
+    expect(renderToStaticMarkup(<PageBody data-testid="body" aria-label="本文">本文</PageBody>)).toMatch(
+      /^<div data-testid="body" aria-label="本文" class=/
+    );
+    expect(renderToStaticMarkup(<Section id="s" title="見出し" data-testid="section" />)).toMatch(
+      /^<section id="s" data-testid="section" class=/
+    );
   });
 
   it("中身は PageBody と同じ計測コンテナに入る（ワイドモニタで左端が揃う）", () => {
