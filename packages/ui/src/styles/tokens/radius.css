@@ -1,0 +1,13 @@
+/* Tailwind radii on a 14px root. */
+:root {
+  --radius-sm: 0.25rem;   /* rounded      3.5px  kbd, tiny chips */
+  --radius-md: 0.375rem;  /* rounded-md   5.25px inputs, tables, nav items */
+  --radius-lg: 0.5rem;    /* rounded-lg   7px    cards, banners, toasts */
+  --radius-xl: 0.75rem;   /* rounded-xl   10.5px dialog, command palette */
+  --radius-pill: 9999px;  /* badges, toggle chips, switch */
+
+  --button-radius: 6px;   /* PROPOSED — NL2SQL button spec */
+  --card-radius: var(--radius-lg);
+  --input-radius: var(--radius-md);
+  --dialog-radius: var(--radius-xl);
+}

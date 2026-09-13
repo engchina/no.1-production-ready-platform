@@ -43,6 +43,7 @@ jobs:
           test -f packages/ui/dist/index.js
           test -f packages/ui/dist/index.d.ts
           test -f packages/ui/dist/tokens.css
+          test -f packages/ui/dist/tokens/colors.css
 
   backend-core:
     name: Build & test (production-ready-backend-core)

@@ -7,7 +7,7 @@ import { Button } from "../src/components/ui/button";
 import { Spinner } from "../src/components/ui/spinner";
 
 const tokensCss = readFileSync(
-  new URL("../src/styles/tokens.css", import.meta.url),
+  new URL("../src/styles/tokens/base.css", import.meta.url),
   "utf8"
 );
 
@@ -63,7 +63,7 @@ describe("Button loading spinner", () => {
     expect(html).toContain("disabled");
   });
 
-  it("tokens.css が回転原点を図形中心へ固定し合成レイヤーで回す", () => {
+  it("base.css が回転原点を図形中心へ固定し合成レイヤーで回す", () => {
     expect(tokensCss).toMatch(/svg\.animate-spin\s*\{[^}]*transform-box:\s*view-box/);
     expect(tokensCss).toMatch(/svg\.animate-spin\s*\{[^}]*transform-origin:\s*50%\s*50%/);
     expect(tokensCss).toMatch(/svg\.animate-spin\s*\{[^}]*will-change:\s*transform/);
