@@ -48,6 +48,7 @@ export function PageHeader({
   breadcrumbs,
   actions,
   actionsLabel = "ページ操作",
+  actionsTestId,
   tabs,
   wide = false,
   className,
@@ -67,6 +68,8 @@ export function PageHeader({
   actions?: PageHeaderAction[] | ReactNode;
   /** アクション群の aria-label（翻訳済み）。 */
   actionsLabel?: string;
+  /** アクション群の data-testid。 */
+  actionsTestId?: string;
   /** `<Tabs>` を渡すとヘッダー下端に吸い付く（ビュー切替の唯一の置き場所）。 */
   tabs?: ReactNode;
   wide?: boolean;
@@ -109,7 +112,7 @@ export function PageHeader({
           {meta ? <div className="mt-1 text-xs text-fg-muted">{meta}</div> : null}
         </div>
         {(Array.isArray(actionNodes) ? actionNodes.length > 0 : actionNodes) ? (
-          <div role="group" aria-label={actionsLabel} className="flex min-w-0 flex-wrap items-center gap-2">
+          <div role="group" aria-label={actionsLabel} data-testid={actionsTestId} className="flex min-w-0 flex-wrap items-center gap-2">
             {actionNodes}
           </div>
         ) : null}
