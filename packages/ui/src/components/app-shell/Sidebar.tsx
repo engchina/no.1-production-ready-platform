@@ -65,8 +65,9 @@ export function Sidebar({
 
   return (
     <aside
+      data-surface="inverted"
       className={cn(
-        "sidebar-shell flex h-screen shrink-0 flex-col overflow-hidden bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-out motion-reduce:transition-none",
+        "sidebar-shell flex h-screen shrink-0 flex-col overflow-hidden bg-surface text-fg-muted transition-[width] duration-200 ease-out motion-reduce:transition-none",
         collapsed ? "w-16" : "w-60"
       )}
       aria-label={labels.aria}
@@ -74,13 +75,13 @@ export function Sidebar({
     >
       <div
         className={cn(
-          "flex h-14 shrink-0 items-center border-b border-white/10",
+          "flex h-14 shrink-0 items-center border-b border-border",
           collapsed ? "justify-center px-2" : "justify-between px-3"
         )}
       >
         <div
           className={cn(
-            "sidebar-reveal min-w-0 px-2 text-white",
+            "sidebar-reveal min-w-0 px-2 text-fg",
             collapsed ? "w-0 px-0" : "flex-1"
           )}
           aria-hidden={collapsed}
@@ -89,13 +90,13 @@ export function Sidebar({
           <span className="block whitespace-nowrap text-base font-bold leading-5">
             {title.line1}
           </span>
-          <span className="block whitespace-nowrap text-xs font-semibold leading-4 text-sidebar-foreground/80">
+          <span className="block whitespace-nowrap text-xs font-semibold leading-4 text-fg-muted">
             {title.line2}
           </span>
         </div>
         <button
           type="button"
-          className="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-md text-sidebar-foreground/90 transition-colors hover:bg-white/10 hover:text-white"
+          className="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-md text-fg-muted transition-colors hover:bg-surface-hover hover:text-fg"
           aria-label={collapsed ? labels.expand : labels.collapse}
           aria-expanded={!collapsed}
           title={collapsed ? labels.expand : labels.collapse}
@@ -113,7 +114,7 @@ export function Sidebar({
               aria-label={labels.commandOpen}
               title={collapsed ? undefined : labels.commandOpen}
               className={cn(
-                "mb-3 flex h-9 min-h-9 w-full items-center overflow-hidden rounded-md border border-white/10 text-sm text-sidebar-foreground/80 transition-colors hover:bg-white/10 hover:text-white",
+                "mb-3 flex h-9 min-h-9 w-full items-center overflow-hidden rounded-md border border-border text-sm text-fg-muted transition-colors hover:bg-surface-hover hover:text-fg",
                 collapsed ? "justify-center px-0" : "gap-2 px-3"
               )}
             >
@@ -129,7 +130,7 @@ export function Sidebar({
               </span>
               <kbd
                 className={cn(
-                  "sidebar-reveal shrink-0 rounded border border-white/20 px-1.5 py-0.5 text-xs font-medium text-sidebar-foreground/70",
+                  "sidebar-reveal shrink-0 rounded border border-border-strong px-1.5 py-0.5 text-xs font-medium text-fg-subtle",
                   collapsed && "hidden"
                 )}
                 aria-hidden
@@ -151,7 +152,7 @@ export function Sidebar({
               {collapsible ? (
                 <button
                   type="button"
-                  className="sidebar-reveal flex w-full items-center justify-between gap-2 rounded-md px-3 py-1 text-xs font-semibold uppercase tracking-wide transition-colors hover:bg-white/10 [--sidebar-reveal-opacity:0.6]"
+                  className="sidebar-reveal flex w-full items-center justify-between gap-2 rounded-md px-3 py-1 text-xs font-semibold uppercase tracking-wide transition-colors hover:bg-surface-hover [--sidebar-reveal-opacity:0.6]"
                   aria-expanded={sectionExpanded}
                   aria-controls={regionId}
                   aria-label={
@@ -167,7 +168,7 @@ export function Sidebar({
                     <span className="truncate">{section.title}</span>
                     {collapsedWithActive ? (
                       <span
-                        className="h-1.5 w-1.5 shrink-0 rounded-full bg-sidebar-active"
+                        className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent-emphasis"
                         aria-hidden
                         title={labels.sectionContainsActive}
                       />
@@ -222,7 +223,7 @@ export function Sidebar({
                             className={cn(
                               "relative flex h-11 min-h-11 items-center overflow-hidden rounded-md text-sm transition-colors",
                               collapsed ? "justify-center px-0" : "gap-2.5 px-3 py-2",
-                              active ? "bg-sidebar-active text-white" : "hover:bg-white/10"
+                              active ? "bg-accent-emphasis text-fg-on-accent" : "hover:bg-surface-hover hover:text-fg"
                             )}
                             aria-current={active ? "page" : undefined}
                             aria-label={ariaLabel}
@@ -231,7 +232,7 @@ export function Sidebar({
                             {/* 左アクセントバー: 現在地を背景色だけに頼らず位置でも示す（color-not-only）。 */}
                             {active ? (
                               <span
-                                className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-white"
+                                className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-fg"
                                 aria-hidden
                               />
                             ) : null}
@@ -257,7 +258,7 @@ export function Sidebar({
         })}
       </nav>
       {footer ? (
-        <div className={cn("border-t border-white/10 py-3", collapsed ? "px-2" : "px-3")}>
+        <div className={cn("border-t border-border py-3", collapsed ? "px-2" : "px-3")}>
           {footer}
         </div>
       ) : null}
@@ -315,7 +316,8 @@ function SidebarTooltip({
             <div
               role="tooltip"
               aria-hidden
-              className="pointer-events-none fixed z-[1000] max-w-[16rem] -translate-y-1/2 truncate whitespace-nowrap rounded-md bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-white shadow-lg ring-1 ring-white/10"
+              data-surface="inverted"
+              className="pointer-events-none fixed z-[var(--z-popover)] max-w-[16rem] -translate-y-1/2 truncate whitespace-nowrap rounded-md bg-surface-overlay px-2.5 py-1.5 text-xs font-medium text-fg shadow-[var(--shadow-popover)] ring-1 ring-border"
               style={{ top: coords.top, left: coords.left }}
             >
               {label}

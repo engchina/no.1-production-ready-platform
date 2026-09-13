@@ -5,14 +5,14 @@ import { cn } from "../../lib/utils";
 import { Spinner } from "./spinner";
 
 export const buttonVariants = cva(
-  "inline-flex max-w-full cursor-pointer items-center justify-center gap-1.5 overflow-hidden whitespace-nowrap rounded-md text-sm font-medium leading-none transition-colors disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring [&>span]:min-w-0 [&>span]:truncate [&>svg]:block [&>svg]:shrink-0",
+  "inline-flex max-w-full cursor-pointer items-center justify-center gap-1.5 overflow-hidden whitespace-nowrap rounded-md text-sm font-medium leading-none transition-colors disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring [&>span]:min-w-0 [&>span]:truncate [&>svg]:block [&>svg]:shrink-0",
   {
     variants: {
       variant: {
-        primary: "bg-primary text-primary-foreground hover:bg-primary/90",
-        secondary: "border border-border bg-card text-foreground hover:bg-background",
-        ghost: "text-foreground hover:bg-background",
-        danger: "bg-danger text-white hover:bg-danger/90",
+        primary: "bg-accent-emphasis text-fg-on-accent hover:bg-accent-emphasis-hover",
+        secondary: "border border-border-control bg-surface text-fg hover:bg-surface-hover",
+        ghost: "text-fg hover:bg-surface-hover",
+        danger: "bg-danger-emphasis text-fg-on-emphasis hover:bg-[color-mix(in_srgb,var(--color-danger-emphasis)_88%,#000)]",
       },
       size: {
         sm: "h-8 px-3",

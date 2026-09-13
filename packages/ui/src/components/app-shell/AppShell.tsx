@@ -18,7 +18,7 @@ export function AppShell({
   mainClassName?: string;
 }) {
   return (
-    <div className={cn("flex h-screen w-full overflow-hidden bg-background", className)}>
+    <div className={cn("flex h-screen w-full overflow-hidden bg-canvas", className)}>
       {sidebar}
       <main className={cn("flex min-w-0 flex-1 flex-col overflow-y-auto", mainClassName)}>
         {children}

@@ -51,7 +51,7 @@ export function Banner({
           </p>
         ) : null}
         {children ? (
-          <div className={cn("leading-relaxed text-foreground/90", title && "mt-0.5")}>
+          <div className={cn("leading-relaxed text-fg/90", title && "mt-0.5")}>
             {typeof children === "string" ? <MessageText text={children} /> : children}
           </div>
         ) : null}
@@ -62,7 +62,7 @@ export function Banner({
           type="button"
           onClick={onDismiss}
           aria-label={dismissLabel}
-          className="-mr-2 -mt-2 inline-flex h-[44px] w-[44px] min-h-[44px] min-w-[44px] shrink-0 cursor-pointer items-center justify-center rounded-md text-current/70 transition-colors hover:bg-foreground/5"
+          className="-mr-2 -mt-2 inline-flex h-[44px] w-[44px] min-h-[44px] min-w-[44px] shrink-0 cursor-pointer items-center justify-center rounded-md text-current/70 transition-colors hover:bg-fg/5"
         >
           <X size={14} aria-hidden />
         </button>

@@ -18,13 +18,13 @@ export function PageHeader({
   return (
     <header
       className={cn(
-        "flex items-start justify-between gap-4 border-b border-border bg-card px-8 py-5",
+        "flex items-start justify-between gap-4 border-b border-border bg-surface px-8 py-5",
         className
       )}
     >
       <div className="min-w-0">
-        <h1 className="text-xl font-bold text-foreground">{title}</h1>
-        {subtitle ? <p className="mt-1 text-sm text-muted">{subtitle}</p> : null}
+        <h1 className="text-xl font-bold text-fg">{title}</h1>
+        {subtitle ? <p className="mt-1 text-sm text-fg-muted">{subtitle}</p> : null}
       </div>
       {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
     </header>

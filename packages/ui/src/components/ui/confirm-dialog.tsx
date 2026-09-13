@@ -156,7 +156,7 @@ function ConfirmDialog({
 
   return createPortal(
     <div
-      className="animate-overlay-in fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 p-4"
+      className="animate-overlay-in fixed inset-0 z-[var(--z-dialog)] flex items-center justify-center bg-[var(--scrim)] p-4"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget && dismissOnOverlay) onCancel();
       }}
@@ -167,25 +167,25 @@ function ConfirmDialog({
         aria-modal="true"
         aria-labelledby="confirm-title"
         aria-describedby={description ? "confirm-desc" : undefined}
-        className="animate-dialog-in w-full max-w-md rounded-xl border border-border bg-card p-5 shadow-xl"
+        className="animate-dialog-in w-full max-w-md rounded-xl border border-border bg-surface-overlay p-5 shadow-[var(--shadow-dialog)]"
       >
         <div className="flex items-start gap-3">
           <span
             className={cn(
               "flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
-              tone === "danger" && "bg-danger-bg text-danger",
-              tone === "warning" && "bg-warning-bg text-warning",
-              tone === "info" && "bg-info-bg text-info"
+              tone === "danger" && "bg-danger-subtle text-danger-fg",
+              tone === "warning" && "bg-warning-subtle text-warning-fg",
+              tone === "info" && "bg-info-subtle text-info-fg"
             )}
           >
             <Icon size={18} aria-hidden />
           </span>
           <div className="min-w-0 flex-1">
-            <h2 id="confirm-title" className="text-base font-semibold text-foreground">
+            <h2 id="confirm-title" className="text-base font-semibold text-fg">
               <MessageText text={title} />
             </h2>
             {description ? (
-              <p id="confirm-desc" className="mt-1 text-sm leading-relaxed text-muted">
+              <p id="confirm-desc" className="mt-1 text-sm leading-relaxed text-fg-muted">
                 <MessageText text={description} />
               </p>
             ) : null}

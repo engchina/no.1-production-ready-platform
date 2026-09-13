@@ -21,10 +21,10 @@ export function ToggleChip({
       type="button"
       aria-pressed={selected}
       className={cn(
-        "cursor-pointer rounded-full px-3 py-1 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring",
+        "cursor-pointer rounded-full px-3 py-1 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus-ring",
         selected
-          ? "bg-primary text-primary-foreground"
-          : "border border-border bg-card text-muted hover:bg-background hover:text-foreground",
+          ? "border border-transparent bg-accent-emphasis text-fg-on-accent"
+          : "border border-border-control bg-surface text-fg-muted hover:bg-surface-hover hover:text-fg",
         className
       )}
       {...props}

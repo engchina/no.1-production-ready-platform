@@ -18,7 +18,7 @@ export function FieldError({
 }) {
   if (!message) return null;
   return (
-    <p id={id} role="alert" className={cn("text-xs leading-relaxed text-danger", className)}>
+    <p id={id} role="alert" className={cn("text-xs leading-relaxed text-danger-fg", className)}>
       <MessageText text={message} />
     </p>
   );
