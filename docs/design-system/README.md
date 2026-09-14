@@ -217,11 +217,30 @@ import { Ellipsis, RefreshCw, Upload } from "lucide-react";
 <Button variant="ghost" iconOnly icon={Ellipsis} aria-label="その他の操作" />
 ```
 
+**役割と配置から選ぶ（色と高さは別々に判断する）**
+
+| 配置 / 操作 | variant | size（desktop） | アイコン |
+|---|---|---|---|
+| ページヘッダーの主操作 | `primary` | `md`（36px） | 操作を示すアイコン |
+| ページヘッダーの表示更新・DB構造再取得 | `secondary`（`kind=utility`） | `md`（36px） | `RefreshCw` |
+| 工程・フォーム末尾で次工程へ進む操作（情報取得・生成・保存・実行） | `primary` | `lg`（40px） | 取得 `Database` / 生成 `Sparkles` / 保存 `Save` / 実行 `Play` 等 |
+| 同じ工程操作行の再試行・リセット・キャンセル | `secondary` / `ghost`（補助） | 主操作と同じ `lg` | `RefreshCw` / `X` 等 |
+| コンテンツのコピー・ダウンロード・状態再確認 | `secondary` | `sm`（32px） | `Copy` / `Download` / `RefreshCw` |
+| 一覧の追加読込 | `secondary` | `sm`（32px） | `ListPlus` |
+| 一括選択 / 選択解除 | `secondary` / `ghost` | 同じ `sm`（32px） | `CheckSquare` / `X` |
+| 確認ダイアログの確定 / 取消 | `primary` または `danger` / `secondary` | 共通ダイアログに従い、同じ行で統一 | ダイアログの専用規約を優先 |
+| 入力欄に隣接する操作 | 操作の役割で決定 | `touchTarget`（44px） | 操作を示すアイコン |
+
+- **タッチ端末は全サイズ44px**。32/36/40pxは位置に応じた密度の違いであり、primaryだけを大きくする規則ではない。同じ操作行のprimary/secondary/ghostは同じ高さにする。
+- **取得という動詞だけでsecondaryにしない。** 対象選択・内容確認へ進む唯一の主操作はprimary。すでに表示した一覧の再読込や状態再確認はsecondary。
+- disabledでも同じサイズとアイコンを保つ。未選択だからアイコンを消したり、高さを変えたりしない。
+- サイズ・色・角丸・アイコン枠は`packages/ui`の`Button`とトークンが実装する。アプリはrole/placementからpropsを選び、独自CSSや同等部品を作らない。
+
 **アイコンをいつ付けるか（role で決まる。好みで決めない）**
 
 | 場面 | アイコン |
 |---|---|
-| ページ / ダイアログの primary | **必ず付ける**（一番速く見つける対象なので目印になる） |
+| ページ / 工程の primary | **必ず付ける**（一番速く見つける対象なので目印になる） |
 | secondary・utility で定番のグリフがある | 付ける（再読込 `RefreshCw` / CSV 出力 `Download` / 削除 `Trash2` / 編集 `Pencil`） |
 | ダイアログのアクション行 | **付けない**（tone アイコンと競合しノイズになる） |
 | 表の行・密なツールバー | `iconOnly` + `aria-label`（場所が無い） |
