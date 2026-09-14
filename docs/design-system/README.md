@@ -62,6 +62,7 @@ TIER 2   tokens/colors.css          --color-surface / --color-fg-muted / --color
                                     ★ アプリとコンポーネントが参照してよいのはここだけ
 TIER 2.5 [data-surface="inverted"]  常に暗い面（サイドバー）
          [data-surface="code"]      常に暗い面（SQL / ログ）
+         [data-surface-tint="accent"] 淡アクセント面の上の文字だけを深くする（DataTable の選択行）
 TIER 3   components/components.css  hover / focus / disabled の状態のみ。TIER 2 のみ参照
          tokens/a11y.css            forced-colors / prefers-contrast の応答層（最後に @import）
 ```
@@ -415,6 +416,8 @@ import { Ellipsis, RefreshCw, Upload } from "lucide-react";
 情報色 `#1d4ed8`（紫寄りの別の青）を**廃止**し、`--color-info-fg` をアクセントと**同一色相**の `--blue-650 #155a97` にしました（淡青面上 5.84:1、白上 7.15:1）。**色相は1つ、明度で役割を分ける**のが標準解です。
 
 暗い面ではトーンが沈むため、`-muted` / `-subtle` の混合率をダークで上げています。塗りの上の文字は常に `--color-fg-on-accent`（白・両テーマ 4.9:1 以上）。**製品ごとのアクセント色は作らない。**
+
+**淡アクセント面の上の文字（`[data-surface-tint="accent"]`、platform #64）。** `--color-accent-subtle` の上ではライトの `--color-fg-muted` が 4.36:1、`--color-accent-fg` が 4.44:1 に下がり AA を満たしません。淡アクセント面を塗る要素（`DataTable` の選択行）に `data-surface-tint="accent"` を付けると、内側の `--color-fg-muted` がライト `--neutral-650`（5.09:1、ダークは据え置き 7.58:1）に、`--color-accent-fg` が `--color-accent-fg-strong`（6.43:1 / 7.35:1）に替わります。`[data-surface]` と違って面のトークン一式は宣言し直さないので、`prefers-contrast: more` の強い値は残ります（a11y.css もこのセレクタを対象にしています）。
 
 ### 状態色 — 4系統 × 4役割
 

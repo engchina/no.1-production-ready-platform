@@ -650,8 +650,8 @@ export function DataTable({ columns = [], rows = [], rowKey = "id", dense = fals
 > | `stickyHeader` | `thead` をスクロール領域の上端に固定する。罫線は th の内側（inset shadow）に持たせ、スクロールしても消えない |
 > | `visibleRows` / `fillVisibleRows` | `number` か `{ base, md }`（md = 48rem 以上）。表頭 + 先頭 N 行の**実測高さ**でスクロール領域の `max-height`（fill では `height`）を決める。2 行セルで行高が変わっても N 行ちょうどが見える |
 > | `scrollAriaLabel` / `scrollTestId` | スクロール領域を `role="region"` + `tabIndex=0` + フォーカスリングにする（WCAG 2.1.1 キーボードでスクロール） |
-> | `selectedRowKey` | master-detail で表示中の行。`aria-current="true"` + `bg-accent-subtle`。全行に `data-selected` |
-> | `isRowSelected` | チェックボックスの複数選択。背景だけ付け、状態はチェックボックスが伝える |
+> | `selectedRowKey` | master-detail で表示中の行。`aria-current="true"` + `bg-accent-subtle` + 先頭セルの左バー（0.25rem、`--color-accent-fg`。選択を色の差だけで示さない = WCAG 1.4.1）+ `data-surface-tint="accent"`（行内の `fg-muted` / `accent-fg` を淡青面用に深くする = 4.5:1）。全行に `data-selected` |
+> | `isRowSelected` | チェックボックスの複数選択。背景・左バー・`data-surface-tint` だけ付け、状態はチェックボックスが伝える |
 > | `onRowClick` | マウス操作の補助。行内の button / a / input / label 等のクリックでは発火しない。キーボード用に行内の button も置く |
 > | `rowProps` | 行の `className` / `aria-label` / `data-testid` |
 > | `renderRowDetail` | 行の直後に全幅の補足行（分析結果など）。`visibleRows` の計測では直前の行に含める |
