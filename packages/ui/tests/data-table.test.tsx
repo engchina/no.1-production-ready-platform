@@ -56,19 +56,31 @@ describe("DataTable の一覧向け機能", () => {
     expect(html).toMatch(/^<div role="region" aria-label="一覧。スクロールできます。" tabindex="0" data-testid="list-scroll" class="[^"]*overflow-auto[^"]*focus-visible:outline-focus-ring/);
   });
 
-  it("selectedRowKey は該当行だけに aria-current と選択背景を付け、全行に data-selected を出す", () => {
+  it("selectedRowKey は該当行だけに aria-current・選択背景・左バー・淡アクセント面の文字スコープを付け、全行に data-selected を出す", () => {
     const html = renderToStaticMarkup(
       <DataTable columns={columns} rows={rows} getRowKey={(row) => row.id} selectedRowKey="b" onRowClick={() => undefined} />
     );
     expect(html).toMatch(/<tr data-row-kind="data" data-selected="false" class="transition-colors cursor-pointer hover:bg-surface-hover">/);
-    expect(html).toMatch(/<tr data-row-kind="data" data-selected="true" aria-current="true" class="transition-colors cursor-pointer bg-accent-subtle">/);
+    expect(html).toMatch(
+      /<tr data-row-kind="data" data-selected="true" data-surface-tint="accent" aria-current="true" class="transition-colors cursor-pointer bg-accent-subtle \[&amp;&gt;:first-child\]:shadow-\[inset_0\.25rem_0_0_var\(--color-accent-fg\)\]">/
+    );
+    expect(html.match(/data-surface-tint/g)).toHaveLength(1);
   });
 
-  it("isRowSelected は背景だけを付け、aria-current は付けない（状態はチェックボックスが伝える）", () => {
+  it("isRowSelected は背景と左バーだけを付け、aria-current は付けない（状態はチェックボックスが伝える）", () => {
     const html = renderToStaticMarkup(
-      <DataTable columns={columns} rows={rows} getRowKey={(row) => row.id} isRowSelected={(row) => row.id === "a"} />
+      <DataTable
+        columns={columns}
+        rows={rows}
+        getRowKey={(row) => row.id}
+        isRowSelected={(row) => row.id === "a"}
+        renderRowDetail={() => <p>補足</p>}
+      />
     );
-    expect(html).toMatch(/<tr data-row-kind="data" data-selected="true" class="transition-colors bg-accent-subtle">/);
+    expect(html).toMatch(/<tr data-row-kind="data" data-selected="true" data-surface-tint="accent" class="transition-colors bg-accent-subtle \[&amp;&gt;:first-child\]:shadow-/);
+    // 詳細行は選択行の続きとして同じ面・左バー・文字スコープを持つ。非選択行の詳細行は持たない。
+    expect(html).toMatch(/<tr data-row-kind="detail" data-surface-tint="accent" class="bg-accent-subtle \[&amp;&gt;:first-child\]:shadow-/);
+    expect(html).toMatch(/<tr data-row-kind="detail"><td/);
     expect(html).not.toContain("aria-current");
   });
 

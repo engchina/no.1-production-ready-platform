@@ -162,3 +162,19 @@
   --color-border:   rgb(255 255 255 / 0.10);
   --color-focus-ring: var(--blue-300);
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   淡アクセント面の文字（[data-surface-tint="accent"]）
+
+   --color-accent-subtle（DataTable の選択行など）を塗った要素に付ける。
+   --color-fg-muted（ライト #6b7280）は canvas / surface 上で 4.5:1 を満たすが、淡青面の上では 4.36:1、
+   --color-accent-fg も 4.44:1 に下がる（WCAG 1.4.3 不適合、platform #64）。内側の文字だけを 1 段深くする:
+       fg-muted   ライト --neutral-650  5.09:1（ダークは据え置き 7.58:1）
+       accent-fg  --color-accent-fg-strong  ライト 6.43:1 / ダーク 7.35:1
+   [data-surface] と違い、面のトークン一式は宣言し直さない（外側の prefers-contrast の値を潰さないため）。
+   a11y.css の forced-colors / prefers-contrast はこのセレクタも対象にしている。
+   ───────────────────────────────────────────────────────────────────────── */
+[data-surface-tint="accent"] {
+  --color-fg-muted:  light-dark(var(--neutral-650), var(--neutral-350));
+  --color-accent-fg: var(--color-accent-fg-strong);
+}

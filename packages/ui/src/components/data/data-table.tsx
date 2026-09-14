@@ -93,6 +93,14 @@ const ALIGN_CLASS: Record<NonNullable<DataTableColumn<unknown>["align"]>, string
   center: "text-center",
 };
 
+/**
+ * 選択行: 淡アクセント面 + 先頭セルの左バー（Sidebar の現在地と同じ 0.25rem）。
+ * 左バーは選択を背景色の差（1.1:1 程度）だけに頼らず位置と形でも示す（WCAG 1.4.1）。
+ * 内側の文字は data-surface-tint="accent"（tokens/colors.css）が淡青面用に 1 段深くする（WCAG 1.4.3）。
+ * renderRowDetail の詳細行も、選択行の続きとして同じ面と左バーを持つ。
+ */
+const SELECTED_ROW_CLASS = "bg-accent-subtle [&>:first-child]:shadow-[inset_0.25rem_0_0_var(--color-accent-fg)]";
+
 /** 行クリックを発火させない行内の操作要素。 */
 const INTERACTIVE_SELECTOR =
   'a,button,input,select,textarea,label,summary,[role="button"],[role="checkbox"],[role="link"],[role="menuitem"],[role="switch"],[contenteditable="true"],[data-row-action]';
@@ -354,6 +362,7 @@ export function DataTable<T>({
                     <tr
                       data-row-kind="data"
                       data-selected={selectable ? (selected ? "true" : "false") : undefined}
+                      data-surface-tint={selected ? "accent" : undefined}
                       aria-current={current ? "true" : undefined}
                       aria-label={extra?.["aria-label"]}
                       data-testid={extra?.["data-testid"]}
@@ -361,7 +370,7 @@ export function DataTable<T>({
                       className={cn(
                         (onRowClick || selectable) && "transition-colors",
                         onRowClick && "cursor-pointer",
-                        selected ? "bg-accent-subtle" : onRowClick && "hover:bg-surface-hover",
+                        selected ? SELECTED_ROW_CLASS : onRowClick && "hover:bg-surface-hover",
                         extra?.className
                       )}
                     >
@@ -383,7 +392,11 @@ export function DataTable<T>({
                       })}
                     </tr>
                     {detail != null && detail !== false ? (
-                      <tr data-row-kind="detail" className={selected ? "bg-accent-subtle" : undefined}>
+                      <tr
+                        data-row-kind="detail"
+                        data-surface-tint={selected ? "accent" : undefined}
+                        className={selected ? SELECTED_ROW_CLASS : undefined}
+                      >
                         <td colSpan={Math.max(columns.length, 1)} className={cellPad}>
                           {detail}
                         </td>
