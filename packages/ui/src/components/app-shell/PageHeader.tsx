@@ -16,7 +16,7 @@ import { measureClass } from "./PageBody";
 
 export interface PageHeaderAction {
   id: string;
-  /** primary = ページの主操作 / secondary / utility = ghost / danger = 破壊的操作。 */
+  /** primary = ページの主操作 / secondary / utility = 枠付き secondary / danger = 破壊的操作。 */
   kind: "primary" | "secondary" | "utility" | "danger";
   /** 翻訳済みラベル。省略するとアイコンだけのボタンになる（`ariaLabel` 必須）。 */
   label?: string;
@@ -31,7 +31,7 @@ export interface PageHeaderAction {
 }
 
 const ORDER: Record<PageHeaderAction["kind"], number> = { danger: 0, utility: 1, secondary: 2, primary: 3 };
-const VARIANT = { primary: "primary", secondary: "secondary", utility: "ghost", danger: "danger" } as const;
+const VARIANT = { primary: "primary", secondary: "secondary", utility: "secondary", danger: "danger" } as const;
 
 /**
  * アクションの並び順。右寄せグループなので右端（最も押しやすい位置）に primary、左端に danger。
