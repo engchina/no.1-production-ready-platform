@@ -216,7 +216,7 @@ import { Icon } from "../core/Icon.jsx";
    旧構成は primary が左端で danger が右端＝最も破壊的な操作が最も押しやすい位置でした。
    danger は本来オーバーフローメニューに入れるべきものです（DropdownMenu 実装後に移行）。 */
 const ORDER = { danger: 0, utility: 1, secondary: 2, primary: 3 };
-const VARIANT = { primary: "primary", secondary: "secondary", utility: "ghost", danger: "danger" };
+const VARIANT = { primary: "primary", secondary: "secondary", utility: "secondary", danger: "danger" };
 
 /** Location trail for 3+ level flows. The last item is the current page. */
 export function Breadcrumbs({ items = [], onNavigate }) {

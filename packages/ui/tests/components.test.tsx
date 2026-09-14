@@ -52,6 +52,19 @@ describe("Tabs のバッジ", () => {
 });
 
 describe("PageHeader", () => {
+  it("utility は secondary と同じ枠を持ち、loading / disabled でもラベルを保つ", () => {
+    for (const state of [{}, { loading: true }, { disabled: true }]) {
+      const markup = (kind: "utility" | "secondary") => renderToStaticMarkup(
+        <PageHeader title="テーブルの管理" actions={[
+          { id: "refresh", kind, label: "表示を更新", icon: RefreshCw, ...state },
+        ]} />
+      );
+      expect(markup("utility")).toBe(markup("secondary"));
+      expect(markup("utility")).toContain("border-border-control");
+      expect(markup("utility")).toContain("表示を更新");
+    }
+  });
+
   it("狭い画面では主操作 1 つだけを見せ、danger は常にメニューに入れる", () => {
     const a = (id: string, kind: "primary" | "secondary" | "utility" | "danger") => ({ id, kind, label: id });
     const ids = (r: ReturnType<typeof splitCompactActions>) => [r.visible.map((x) => x.id), r.overflow.map((x) => x.id)];
